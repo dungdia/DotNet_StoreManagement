@@ -1,0 +1,6 @@
+﻿services:
+  dotnet_storemanagement:
+    image: dotnet_storemanagement
+    build:
+      context: .
+      dockerfile: Dockerfile

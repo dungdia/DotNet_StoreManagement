@@ -1,0 +1,6 @@
+@DotNet_StoreManagement_HostAddress = http://localhost:5213
+
+GET {{DotNet_StoreManagement_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

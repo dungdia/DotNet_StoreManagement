@@ -1,0 +1,22 @@
+appsettings.Development.json
+# Binaries
+[Bb]in/
+[Oo]bj/
+# Packages
+*.nupkg
+# Rider
+.idea/
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.log
+# Test Results
+TestResults/
+# Database files
+*.mdf
+*.ldf
+# Azure App Service
+app_data/
+# Other
+node_modules/
