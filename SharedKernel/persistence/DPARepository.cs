@@ -106,4 +106,27 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
             TotalPages = total
         };
     }
+
+    public async Task<Page<TEntity>> FindAllPageAsync_V2(IQueryable<TEntity> filter, string sortBy, string orderBy, int pageNumber = 1, int pageSize = 5)
+    {
+        if (!String.IsNullOrEmpty(sortBy) && !String.IsNullOrEmpty(orderBy) && orderBy.Contains("desc"))
+        {
+            filter = filter.OrderByDescending(p => EF.Property<object>(p, sortBy));   
+        }
+
+        var totalPages = await filter.CountAsync();
+        
+        var content = await filter
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        
+        return new Page<TEntity>
+        {
+            Content = content,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = totalPages
+        };
+    }
 }

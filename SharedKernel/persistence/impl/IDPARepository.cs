@@ -13,4 +13,12 @@ public interface IDPARepository<TEntity, TKey> :
         int pageNumber = 1,
         int pageSize = 5
     );
+    
+    public Task<Page<TEntity>> FindAllPageAsync_V2(
+        IQueryable<TEntity> filter,
+        String? sortBy,
+        String? orderBy,
+        int pageNumber = 1,
+        int pageSize = 5
+    );
 }

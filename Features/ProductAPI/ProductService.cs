@@ -7,6 +7,7 @@ using DotNet_StoreManagement.Features.ProductAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
 using DotNet_StoreManagement.SharedKernel.utils;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace DotNet_StoreManagement.Features.ProductAPI;
@@ -22,42 +23,69 @@ public class ProductService
         _repo = repo;
         _mapper = mapper;
     }
-    
-    public async Task<Page<Product>> getPageableProduct(ProductFilter? dtoFilter, PageRequest pageRequest)
-    {
-        Expression<Func<Product, bool>> filter = p => true;
 
-        if (dtoFilter != null)
+    public async Task<Page<Product>> findProductByProp(ProductFilterDTO? dtoFilter, PageRequest pageRequest)
+    {
+        IQueryable<Product> query = _repo.GetQueryable();
+        
+        
+        if (!String.IsNullOrEmpty(dtoFilter?.ProductName))
         {
-            if (!string.IsNullOrEmpty(dtoFilter.ProductName))
-            {
-                filter = (p => p.ProductName.ToLower().Contains(dtoFilter.ProductName.ToLower()));
-            }
-            
-            if (!string.IsNullOrEmpty(dtoFilter.Barcode))
-            {
-                filter = (p => p.Barcode != null && p.Barcode.ToLower().Contains(dtoFilter.Barcode.ToLower()));
-            }
-            
-            if (dtoFilter.Price > 0)
-            {
-                filter = (p => p.Price == dtoFilter.Price);
-            }
-            
-            if (!string.IsNullOrEmpty(dtoFilter.Unit))
-            {
-                filter = (p => p.Unit != null && p.Unit.ToLower().Contains(dtoFilter.Unit.ToLower()));
-            }
-            
-            if (dtoFilter.CreatedAt.HasValue)
-            {
-                var date = dtoFilter.CreatedAt.Value.Date;
-                filter = (p => p.CreatedAt.HasValue && p.CreatedAt.Value.Date == date);
-            }
+            query = query.Where(p => p.ProductName.ToLower().Contains(dtoFilter.ProductName.ToLower())); 
+        }
+
+        if (!String.IsNullOrEmpty(dtoFilter?.Unit))
+        {
+            query = query.Where(p => p.Unit != null && p.Unit.ToLower().Contains(dtoFilter.Unit.ToLower()));    
         }
         
-        return await _repo.FindAllPageAsync(
-            filter,
+        if (!String.IsNullOrEmpty(dtoFilter?.SortBy) && !String.IsNullOrEmpty(dtoFilter?.OrderBy) && dtoFilter.OrderBy.Contains("desc"))
+        {
+            query = query.OrderByDescending(p => EF.Property<object>(p, dtoFilter.SortBy!));   
+        }
+
+        var totalPages = query.Count();
+        
+        var paginatedProducts = query
+            .Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
+            .Take(pageRequest.PageSize)
+            .ToList();
+        
+        var page = new Page<Product>
+        {
+            Content = paginatedProducts,
+            PageNumber = pageRequest.PageNumber,
+            PageSize = pageRequest.PageSize,
+            TotalPages = totalPages
+        };
+
+        return page;
+    }
+    
+    public async Task<Page<Product>> getPageableProduct(ProductFilterDTO? dtoFilter, PageRequest pageRequest)
+    {
+        IQueryable<Product> query = _repo.GetQueryable();
+        
+        
+        if (!String.IsNullOrEmpty(dtoFilter?.ProductName))
+        {
+            query = query.Where(p => p.ProductName.ToLower().Contains(dtoFilter.ProductName.ToLower())); 
+        }
+
+        if (!String.IsNullOrEmpty(dtoFilter?.Unit))
+        {
+            query = query.Where(p => p.Unit != null && p.Unit.ToLower().Contains(dtoFilter.Unit.ToLower()));    
+        }
+        
+        // Sort
+        if (!String.IsNullOrEmpty(dtoFilter?.SortBy) && !String.IsNullOrEmpty(dtoFilter?.OrderBy) && dtoFilter.OrderBy.Contains("desc"))
+        {
+            query = query.OrderByDescending(p => EF.Property<object>(p, dtoFilter.SortBy!));   
+        }
+        
+        return await _repo.FindAllPageAsync_V2(
+            query,
+            null,
             null,
             pageRequest.PageNumber,
             pageRequest.PageSize

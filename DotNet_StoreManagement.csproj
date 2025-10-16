@@ -36,8 +36,6 @@
 
     <ItemGroup>
       <Folder Include="Domain\" />
-      <Folder Include="Features\AuthAPI\controllers\" />
-      <Folder Include="Features\AuthAPI\repositories\impl\" />
     </ItemGroup>
 
 </Project>

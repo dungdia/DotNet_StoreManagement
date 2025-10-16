@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using DotNet_StoreManagement.SharedKernel.filters;
 
 namespace DotNet_StoreManagement.SharedKernel.configuration;
 
@@ -6,7 +7,13 @@ public static class ControllerConfig
 {
     public static IServiceCollection ControllerConfigExtension(this IServiceCollection services, IConfiguration config)
     {        
-        services.AddControllers().AddJsonOptions(options =>
+        services.AddControllers(options =>
+        {
+            // options.Filters.Add<ValidationFilter>();
+        }).ConfigureApiBehaviorOptions(options =>
+        {
+            // options.SuppressModelStateInvalidFilter = true;
+        }).AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -23,14 +30,12 @@ public static class ControllerConfig
             options.AddPolicy(
                 "AllowAll",
                 policy => policy
-                    .WithOrigins("http://localhost:1337") 
+                    .WithOrigins("http://localhost:5173") 
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials()
             );
         });
-
-        services.AddControllers();
 
         return services;
     }
