@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using AutoMapper;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.Domain.entities.@base;
+using DotNet_StoreManagement.Domain.enums;
 using DotNet_StoreManagement.Features.ProductAPI.dtos;
 using DotNet_StoreManagement.Features.ProductAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
@@ -23,70 +24,19 @@ public class ProductService
         _repo = repo;
         _mapper = mapper;
     }
-
-    public async Task<Page<Product>> findProductByProp(ProductFilterDTO? dtoFilter, PageRequest pageRequest)
-    {
-        IQueryable<Product> query = _repo.GetQueryable();
-        
-        
-        if (!String.IsNullOrEmpty(dtoFilter?.ProductName))
-        {
-            query = query.Where(p => p.ProductName.ToLower().Contains(dtoFilter.ProductName.ToLower())); 
-        }
-
-        if (!String.IsNullOrEmpty(dtoFilter?.Unit))
-        {
-            query = query.Where(p => p.Unit != null && p.Unit.ToLower().Contains(dtoFilter.Unit.ToLower()));    
-        }
-        
-        if (!String.IsNullOrEmpty(dtoFilter?.SortBy) && !String.IsNullOrEmpty(dtoFilter?.OrderBy) && dtoFilter.OrderBy.Contains("desc"))
-        {
-            query = query.OrderByDescending(p => EF.Property<object>(p, dtoFilter.SortBy!));   
-        }
-
-        var totalPages = query.Count();
-        
-        var paginatedProducts = query
-            .Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
-            .Take(pageRequest.PageSize)
-            .ToList();
-        
-        var page = new Page<Product>
-        {
-            Content = paginatedProducts,
-            PageNumber = pageRequest.PageNumber,
-            PageSize = pageRequest.PageSize,
-            TotalPages = totalPages
-        };
-
-        return page;
-    }
     
-    public async Task<Page<Product>> getPageableProduct(ProductFilterDTO? dtoFilter, PageRequest pageRequest)
+    public async Task<Page<Product>> getPageableProduct(ProductFilterDTO? filterDto, PageRequest pageRequest)
     {
         IQueryable<Product> query = _repo.GetQueryable();
         
-        
-        if (!String.IsNullOrEmpty(dtoFilter?.ProductName))
-        {
-            query = query.Where(p => p.ProductName.ToLower().Contains(dtoFilter.ProductName.ToLower())); 
-        }
-
-        if (!String.IsNullOrEmpty(dtoFilter?.Unit))
-        {
-            query = query.Where(p => p.Unit != null && p.Unit.ToLower().Contains(dtoFilter.Unit.ToLower()));    
-        }
-        
-        // Sort
-        if (!String.IsNullOrEmpty(dtoFilter?.SortBy) && !String.IsNullOrEmpty(dtoFilter?.OrderBy) && dtoFilter.OrderBy.Contains("desc"))
-        {
-            query = query.OrderByDescending(p => EF.Property<object>(p, dtoFilter.SortBy!));   
-        }
+        query = _repo.FilterString(query, "ProductName", filterDto?.ProductName, FilterType.CONTAINS);
+        query = _repo.FilterString(query, "Barcode", filterDto?.Barcode, FilterType.CONTAINS);
+        query = _repo.FilterString(query, "Unit", filterDto?.Unit, FilterType.CONTAINS);
         
         return await _repo.FindAllPageAsync_V2(
             query,
-            null,
-            null,
+            filterDto?.SortBy,
+            filterDto?.OrderBy,
             pageRequest.PageNumber,
             pageRequest.PageSize
         );
@@ -130,3 +80,5 @@ public class ProductService
         return product;
     }
 }
+
+

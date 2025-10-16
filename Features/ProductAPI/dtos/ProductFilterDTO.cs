@@ -1,4 +1,5 @@
 ﻿using DotNet_StoreManagement.Domain.entities.@base;
+using DotNet_StoreManagement.Domain.enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -21,16 +22,6 @@ public class ProductFilterDTO : BaseFilter
 
 public class BaseFilter
 {
-    public string? OrderBy { get; set; } 
+    public OrderBy? OrderBy { get; set; } 
     public string? SortBy { get; set; }
-
-    // public BaseFilter()
-    // {
-    // }
-    //
-    // public BaseFilter(string OrderBy, string SortBy)
-    // {
-    //     this.OrderBy = OrderBy;
-    //     this.SortBy = SortBy;
-    // }
 }

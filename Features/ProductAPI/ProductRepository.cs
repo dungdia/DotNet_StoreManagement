@@ -1,4 +1,5 @@
 ﻿using DotNet_StoreManagement.Domain.entities;
+using DotNet_StoreManagement.Domain.enums;
 using DotNet_StoreManagement.Features.ProductAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.persistence;
