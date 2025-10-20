@@ -19,6 +19,7 @@ public class PaymentController : Controller
 
     [HttpGet]
     public async Task<IActionResult> GetPagesOfPaymentAPI(
+        [FromQuery] PaymentFilter? dtoFilter,
         [FromQuery] PageRequest pageRequest
     )
     {
@@ -38,27 +39,27 @@ public class PaymentController : Controller
         return Ok(response);
     }
 
-    [HttpGet("search")]
-    public async Task<IActionResult> SearchPagesOfPaymentAPI(
-        [FromQuery] PaymentFilter dtoFilter,
-        [FromQuery] PageRequest pageRequest
-    )
-    {
-        var result = await _service.GetPageablePayments(dtoFilter, pageRequest);
-
-        var response = new APIResponse<Object>(
-            HttpStatusCode.OK.value(),
-            "Get payments successfully",
-            result.Content
-        ).setMetadata(new
-        {
-            pageNumber = result.PageNumber,
-            pageSize = result.PageSize,
-            totalPages = result.TotalPages
-        });
-
-        return Ok(response);
-    }
+    // [HttpGet("search")]
+    // public async Task<IActionResult> SearchPagesOfPaymentAPI(
+    //     [FromQuery] PaymentFilter dtoFilter,
+    //     [FromQuery] PageRequest pageRequest
+    // )
+    // {
+    //     var result = await _service.GetPageablePayments(dtoFilter, pageRequest);
+    //
+    //     var response = new APIResponse<Object>(
+    //         HttpStatusCode.OK.value(),
+    //         "Get payments successfully",
+    //         result.Content
+    //     ).setMetadata(new
+    //     {
+    //         pageNumber = result.PageNumber,
+    //         pageSize = result.PageSize,
+    //         totalPages = result.TotalPages
+    //     });
+    //
+    //     return Ok(response);
+    // }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPaymentByIdAPI()
