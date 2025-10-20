@@ -1,8 +1,7 @@
 using AutoMapper;
 using DotNet_StoreManagement.Domain.entities;
 
-namespace DotNet_StoreManagement.Features.InventoryAPI;
-
+namespace DotNet_StoreManagement.Features.InventoryAPI.dtos;
 [AutoMap(typeof(Inventory), ReverseMap = true)]
 public class InventoryDTO
 {
