@@ -34,10 +34,4 @@
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Domain\" />
-      <Folder Include="Features\AuthAPI\controllers\" />
-      <Folder Include="Features\AuthAPI\repositories\impl\" />
-    </ItemGroup>
-
 </Project>

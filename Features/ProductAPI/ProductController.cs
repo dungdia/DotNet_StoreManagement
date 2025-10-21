@@ -37,21 +37,21 @@ public class ProductController : Controller
             totalPages = result.TotalPages
         });
         
-        return Ok(response);
+        return StatusCode(response.statusCode, response);
     }
     
     [HttpGet("search")]
     public async Task<IActionResult> SearchPagesOfdMangaAPI(
-        [FromQuery] ProductFilter dtosFilter,
+        [FromQuery] ProductFilterDTO dtoFilter,
         [FromQuery] PageRequest pageRequest
     )
     {
-        var result = await _service.getPageableProduct(dtosFilter, pageRequest);
+        var result = await _service.getPageableProduct(dtoFilter, pageRequest);
 
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),
             "Get product successfully",
-            result.Content
+            result
         ).setMetadata(new
         {
             pageNumber = result.PageNumber,
@@ -59,7 +59,7 @@ public class ProductController : Controller
             totalPages = result.TotalPages
         });
         
-        return Ok(response);
+        return StatusCode(response.statusCode, response);
     }
     
     [HttpPost]
@@ -75,7 +75,7 @@ public class ProductController : Controller
             result
         );
         
-        return Ok(response);
+        return StatusCode(response.statusCode, response);
     }
     
     [HttpPut("{id}")]
@@ -93,7 +93,7 @@ public class ProductController : Controller
             result
         );
         
-        return Ok(response);
+        return StatusCode(response.statusCode, response);
     }
     
     [HttpDelete("{id}")]
@@ -109,6 +109,6 @@ public class ProductController : Controller
             result
         );
         
-        return Ok(response);
+        return StatusCode(response.statusCode, response);
     }
 }

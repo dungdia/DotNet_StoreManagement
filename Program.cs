@@ -2,6 +2,7 @@ using System.Reflection;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
+using DotNet_StoreManagement.SharedKernel.filters;
 using DotNet_StoreManagement.SharedKernel.persistence;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
