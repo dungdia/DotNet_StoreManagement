@@ -15,6 +15,18 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "AllowCors", builder =>
+    {
+        builder
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddAnnotation(Assembly.GetExecutingAssembly());
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -73,6 +85,8 @@ app.MapGet("/api/health/db", async (IConfiguration config) =>
         );
     }
 });
+
+app.UseCors("AllowCors");
 
 app.UseHttpsRedirection();
 
