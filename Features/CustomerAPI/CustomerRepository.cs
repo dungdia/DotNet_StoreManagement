@@ -13,4 +13,9 @@ namespace DotNet_StoreManagement.Features.CustomerAPI;
         {
             _context = context;
         }
-    }
+
+        public IQueryable<Customer> GetQueryable()
+        {
+            return _context.Customers;
+        }
+}

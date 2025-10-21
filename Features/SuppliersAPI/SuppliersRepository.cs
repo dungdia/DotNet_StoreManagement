@@ -14,5 +14,10 @@ namespace DotNet_StoreManagement.Features.SuppliersAPI
         {
             _context = context;
         }
+
+        public IQueryable<Supplier> GetQueryable()
+        {
+            return _context.Suppliers;
+        }
     }
 }

@@ -3,6 +3,7 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.Domain.entities.@base;
+using DotNet_StoreManagement.Domain.enums;
 using DotNet_StoreManagement.Features.CustomerAPI.dtos;
 using DotNet_StoreManagement.Features.CustomerAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
@@ -22,48 +23,22 @@ public class CustomerService
         _mapper = mapper;
     }
 
-    public async Task<Page<Customer>> GetPageableCustomerAsync(CustomerFilter? dtoFilter, PageRequest pageRequest)
+    public async Task<Page<Customer>> GetPageableCustomerAsync(CustomerFilterDTO? dtoFilter, PageRequest pageRequest)
     {
-        Expression<Func<Customer, bool>> filter = c => true;
+        IQueryable<Customer> query = _repo.GetQueryable();
 
-        if (dtoFilter != null)
-        {
-            if (!string.IsNullOrEmpty(dtoFilter.CustomerId.ToString())){
-                filter = (c => c.CustomerId == dtoFilter.CustomerId);
-            }
-
-            if (!string.IsNullOrEmpty(dtoFilter.Name))
-            {
-                filter = (c => c.Name.ToLower().Contains(dtoFilter.Name.ToLower()));
-            }
-
-            if (!string.IsNullOrEmpty(dtoFilter.Address))
-            {
-                filter = (c => c.Address.ToLower().Contains(dtoFilter.Address.ToLower()));
-            }
-
-            if (!string.IsNullOrEmpty(dtoFilter.Phone))
-            {
-                filter = (c => c.Phone != null && c.Phone.ToLower().Contains(dtoFilter.Phone.ToLower()));
-            }
-
-            if (!string.IsNullOrEmpty(dtoFilter.Email))
-            {
-                filter = (c => c.Email != null && c.Email.ToLower().Contains(dtoFilter.Email.ToLower()));
-            }
-
-            if (dtoFilter.CreatedAt.HasValue)
-            {
-                var date = dtoFilter.CreatedAt.Value.Date;
-                filter = (c => c.CreatedAt.HasValue && c.CreatedAt.Value.Date == date);
-            }
-        }
-
-        return await _repo.FindAllPageAsync(
-            filter,
-            null,
+        query = _repo.FilterString(query, "CustomerId", dtoFilter?.CustomerId.ToString(),FilterType.EQUAL);
+        query = _repo.FilterString(query, "Name", dtoFilter?.Name, FilterType.CONTAINS);
+        query = _repo.FilterString(query, "Phone", dtoFilter?.Phone, FilterType.CONTAINS);
+        query = _repo.FilterString(query, "Email", dtoFilter?.Email, FilterType.CONTAINS);
+        query = _repo.FilterString(query, "Address", dtoFilter?.Address, FilterType.CONTAINS);
+        return await _repo.FindAllPageAsync_V2(
+            query,
+            dtoFilter?.SortBy,
+            dtoFilter?.OrderBy,
             pageRequest.PageNumber,
-            pageRequest.PageSize);
+            pageRequest.PageSize
+        );
     }
 
     public async Task<Customer> CreateCustomerAsync(CustomerDTO dto)

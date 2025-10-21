@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace DotNet_StoreManagement.Features.ProductAPI.dtos;
 
-public class ProductFilterDTO : BaseFilter
+public class ProductFilterDTO : BaseFiler
 {
     public string? ProductName { get; set; } 
 
@@ -20,8 +20,4 @@ public class ProductFilterDTO : BaseFilter
     public string? ProductImg { get; set; } 
 }
 
-public class BaseFilter
-{
-    public OrderBy? OrderBy { get; set; } 
-    public string? SortBy { get; set; }
-}
+
