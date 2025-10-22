@@ -4,13 +4,13 @@ using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.persistence;
 
 namespace DotNet_StoreManagement.Features.CustomerAPI;
-    [Repository]
-    public class CustomerRepository : DPARepository<Customer, int>, ICustomerRepository
+[Repository]
+public class CustomerRepository : DPARepository<Customer, int>, ICustomerRepository
+{
+    private readonly AppDbContext _context;
+
+    public CustomerRepository(AppDbContext context) : base(context)
     {
-        private readonly AppDbContext _context;
-        
-        public CustomerRepository(AppDbContext context) : base(context)
-        {
-            _context = context;
-        }
+        _context = context;
     }
+}
