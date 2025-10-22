@@ -1,6 +1,8 @@
-﻿namespace DotNet_StoreManagement.Features.CustomerAPI.dtos
+﻿using DotNet_StoreManagement.Domain.entities.@base;
+
+namespace DotNet_StoreManagement.Features.CustomerAPI.dtos
 {
-    public class CustomerFilter
+    public class CustomerFilterDTO : BaseFiler
     {
         public int? CustomerId { get; set; }
         public string? Name { get; set; }

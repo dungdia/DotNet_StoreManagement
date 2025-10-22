@@ -81,7 +81,7 @@ namespace DotNet_StoreManagement.Features.CustomerAPI
 
         [HttpGet("Search")]
         public async Task<IActionResult> SearchCustomersAsync(
-            [FromQuery] CustomerFilter dtoFilter,
+            [FromQuery] CustomerFilterDTO dtoFilter,
             [FromQuery] PageRequest pageRequest
         ) {
             var result = await _service.GetPageableCustomerAsync(dtoFilter, pageRequest);

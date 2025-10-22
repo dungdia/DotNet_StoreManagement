@@ -2,11 +2,13 @@ using System.Linq.Expressions;
 using AutoMapper;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.Domain.entities.@base;
+using DotNet_StoreManagement.Domain.enums;
 using DotNet_StoreManagement.Features.ProductAPI.dtos;
 using DotNet_StoreManagement.Features.ProductAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
 using DotNet_StoreManagement.SharedKernel.utils;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace DotNet_StoreManagement.Features.ProductAPI;
@@ -23,42 +25,18 @@ public class ProductService
         _mapper = mapper;
     }
     
-    public async Task<Page<Product>> getPageableProduct(ProductFilter? dtoFilter, PageRequest pageRequest)
+    public async Task<Page<Product>> getPageableProduct(ProductFilterDTO? filterDto, PageRequest pageRequest)
     {
-        Expression<Func<Product, bool>> filter = p => true;
-
-        if (dtoFilter != null)
-        {
-            if (!string.IsNullOrEmpty(dtoFilter.ProductName))
-            {
-                filter = (p => p.ProductName.ToLower().Contains(dtoFilter.ProductName.ToLower()));
-            }
-            
-            if (!string.IsNullOrEmpty(dtoFilter.Barcode))
-            {
-                filter = (p => p.Barcode != null && p.Barcode.ToLower().Contains(dtoFilter.Barcode.ToLower()));
-            }
-            
-            if (dtoFilter.Price > 0)
-            {
-                filter = (p => p.Price == dtoFilter.Price);
-            }
-            
-            if (!string.IsNullOrEmpty(dtoFilter.Unit))
-            {
-                filter = (p => p.Unit != null && p.Unit.ToLower().Contains(dtoFilter.Unit.ToLower()));
-            }
-            
-            if (dtoFilter.CreatedAt.HasValue)
-            {
-                var date = dtoFilter.CreatedAt.Value.Date;
-                filter = (p => p.CreatedAt.HasValue && p.CreatedAt.Value.Date == date);
-            }
-        }
+        IQueryable<Product> query = _repo.GetQueryable();
         
-        return await _repo.FindAllPageAsync(
-            filter,
-            null,
+        query = _repo.FilterString(query, "ProductName", filterDto?.ProductName, FilterType.CONTAINS);
+        query = _repo.FilterString(query, "Barcode", filterDto?.Barcode, FilterType.CONTAINS);
+        query = _repo.FilterString(query, "Unit", filterDto?.Unit, FilterType.CONTAINS);
+        
+        return await _repo.FindAllPageAsync_V2(
+            query,
+            filterDto?.SortBy,
+            filterDto?.OrderBy,
             pageRequest.PageNumber,
             pageRequest.PageSize
         );
@@ -102,3 +80,5 @@ public class ProductService
         return product;
     }
 }
+
+

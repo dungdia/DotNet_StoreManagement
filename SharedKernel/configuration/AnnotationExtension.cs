@@ -51,7 +51,7 @@ public static class AnnotationExtension
                     {
                         foreach (var iface in interfaces)
                         {
-                            services.AddScoped(iface, type);
+                            services.AddTransient(iface, type);
                         }
                     }
                 }

@@ -4,13 +4,18 @@ using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.persistence;
 
 namespace DotNet_StoreManagement.Features.CustomerAPI;
-[Repository]
-public class CustomerRepository : DPARepository<Customer, int>, ICustomerRepository
-{
-    private readonly AppDbContext _context;
-
-    public CustomerRepository(AppDbContext context) : base(context)
+    [Repository]
+    public class CustomerRepository : DPARepository<Customer, int>, ICustomerRepository
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
+        
+        public CustomerRepository(AppDbContext context) : base(context)
+        {
+            _context = context;
+        }
+
+        public IQueryable<Customer> GetQueryable()
+        {
+            return _context.Customers;
+        }
 }

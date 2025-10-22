@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
 using DotNet_StoreManagement.Domain.entities.@base;
+using DotNet_StoreManagement.Domain.enums;
+using DotNet_StoreManagement.SharedKernel.exception;
 using DotNet_StoreManagement.SharedKernel.persistence.impl;
 using Microsoft.EntityFrameworkCore;
 
@@ -106,4 +108,58 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
             TotalPages = total
         };
     }
+
+    public async Task<Page<TEntity>> FindAllPageAsync_V2(
+        IQueryable<TEntity> filter, 
+        string? sortBy, 
+        OrderBy? orderBy, 
+        int pageNumber = 1, 
+        int pageSize = 5
+    )
+    {   
+        if (!String.IsNullOrEmpty(sortBy) && orderBy == OrderBy.DESC)
+        {
+            filter = filter.OrderByDescending(p => EF.Property<object>(p, sortBy));   
+        }
+
+        var totalPages = await filter.CountAsync();
+        
+        var content = await filter
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        
+        return new Page<TEntity>
+        {
+            Content = content,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = totalPages
+        };
+    }
+    
+    public IQueryable<TEntity> FilterString(
+        IQueryable<TEntity> query,
+        string key,
+        string? value,
+        FilterType? type)
+    {
+        if (!String.IsNullOrEmpty(value))
+        {
+            switch (type)
+            {
+                case FilterType.EQUAL:
+                    return query.Where(p => EF.Property<string>(p, key).ToLower().Equals(value!.ToLower()));
+                case FilterType.CONTAINS:
+                    return query.Where(p => EF.Property<string>(p, key).ToLower().Contains(value!.ToLower()));
+                case FilterType.START_WITH:
+                    return query.Where(p => EF.Property<string>(p, key).ToLower().StartsWith(value!.ToLower()));
+                default:
+                    return query;
+            }
+        }
+        return query;
+    }
+    
+    // TODO: can implement cac filter khac
 }

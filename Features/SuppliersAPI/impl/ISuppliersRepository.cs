@@ -6,5 +6,6 @@ namespace DotNet_StoreManagement.Features.SuppliersAPI.impl;
 
 public interface ISuppliersRepository : IDPARepository<Supplier, int>
 {
+    public IQueryable<Supplier> GetQueryable();
 }
 

@@ -5,7 +5,7 @@ namespace DotNet_StoreManagement.Features.SuppliersAPI.dtos
 {
 
     [AutoMap(typeof(Supplier),ReverseMap =true)]
-    public class SuppliersDto
+    public class SuppliersDTO
     {
         public string Name { get; set; } = null!;
 
