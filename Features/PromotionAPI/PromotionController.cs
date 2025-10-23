@@ -86,5 +86,19 @@ namespace DotNet_StoreManagement.Features.PromotionAPI
 
             return Ok(response);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> deletePromotion(int id)
+        {
+            var result = await _service.deletePromotion(id);
+
+            var response = new APIResponse<Object>(
+                HttpStatusCode.OK.value(),
+                "Delete promotion successfully",
+                result
+            );
+
+            return Ok(response);
+        }
     }
 }

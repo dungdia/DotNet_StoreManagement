@@ -96,5 +96,19 @@ namespace DotNet_StoreManagement.Features.PromotionAPI
             return result;
         }
 
+        public async Task<int> deletePromotion(int id)
+        {
+            var existingPromotion = await promotionRepo.GetByIdAsync(id);
+
+            if (existingPromotion == null)
+            {
+                throw new APIException(HttpStatusCode.NotFound.value(), "Promotion not found");
+            }
+
+
+
+            var result = await promotionRepo.DeleteAndSaveAsync(existingPromotion);
+            return result;
+        }
     }
 }
