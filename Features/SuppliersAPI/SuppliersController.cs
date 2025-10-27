@@ -53,7 +53,7 @@ public class SuppliersController : Controller
         return StatusCode(response.statusCode, response);
     }
 
-    [HttpGet("/search")]
+    [HttpGet("search")]
     public async Task<IActionResult> searchSuppliers([FromQuery] SuppliersFilterDTO suppliersFilterDTO,[FromQuery]PageRequest pageRequest)
     {
         var allSuppliers = await _service.searchSuppliers(suppliersFilterDTO, pageRequest);
