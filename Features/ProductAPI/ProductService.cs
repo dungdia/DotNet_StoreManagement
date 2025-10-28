@@ -35,8 +35,8 @@ public class ProductService
         
         return await _repo.FindAllPageAsync_V2(
             query,
-            filterDto?.SortBy,
-            filterDto?.OrderBy,
+            null,
+            null,
             pageRequest.PageNumber,
             pageRequest.PageSize
         );
@@ -46,6 +46,9 @@ public class ProductService
     {
         var product = _mapper.Map<Product>(dto);
         product.CreatedAt = DateTime.Now;
+        
+        var existedBarcode = await _repo.FindBarcode(0, dto);
+        if (existedBarcode != null) throw APIException.BadRequest("Barcode da ton tai");
         
         await _repo.AddAsync(product);
         var affectedRows = await _repo.SaveChangesAsync();
@@ -59,11 +62,16 @@ public class ProductService
     {
         var product = await _repo.GetByIdAsync(id);
         
-        if (product == null) throw APIException.BadRequest("Can't find product");
+        if (product == null) throw APIException.BadRequest("San pham khong ton tai");
+
+        var existedBarcode = await _repo.FindBarcode(id, dto);
+        
+        if (existedBarcode != null) throw APIException.BadRequest("Barcode da ton tai");
+        
         await _repo.UpdateAsync(_mapper.Map(dto, product));
         var affectedRows = await _repo.SaveChangesAsync();
         
-        if(affectedRows < 0) throw new ApplicationException("update failed");
+        if(affectedRows < 0) throw new ApplicationException("Cap nhat san pham loi");
         
         return product;
     }

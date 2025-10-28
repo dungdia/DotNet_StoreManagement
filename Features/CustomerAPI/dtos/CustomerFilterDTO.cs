@@ -2,7 +2,7 @@
 
 namespace DotNet_StoreManagement.Features.CustomerAPI.dtos
 {
-    public class CustomerFilterDTO : BaseFiler
+    public class CustomerFilterDTO : BaseFilter
     {
         public int? CustomerId { get; set; }
         public string? Name { get; set; }

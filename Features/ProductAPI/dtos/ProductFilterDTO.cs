@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace DotNet_StoreManagement.Features.ProductAPI.dtos;
 
-public class ProductFilterDTO : BaseFiler
+public class ProductFilterDTO
 {
     public string? ProductName { get; set; } 
 

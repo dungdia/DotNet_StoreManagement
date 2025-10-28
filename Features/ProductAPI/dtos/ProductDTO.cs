@@ -19,6 +19,8 @@ public class ProductDTO
     [Required(ErrorMessage = "Nhập đơn vị")]
     public string Unit { get; set; }
     
-    [Required(ErrorMessage = "Nhập đường dẫn ảnh sản phẩm")]
-    public string ProductImg { get; set; }
+    // [Required(ErrorMessage = "Nhập đường dẫn ảnh sản phẩm")]
+    public string? ProductImg { get; set; }
+    
+    public int? SupplierId { get; set; }
 }
