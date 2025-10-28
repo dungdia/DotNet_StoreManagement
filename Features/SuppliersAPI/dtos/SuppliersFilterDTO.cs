@@ -4,7 +4,7 @@ using DotNet_StoreManagement.Features.ProductAPI.dtos;
 
 namespace DotNet_StoreManagement.Features.SuppliersAPI.dtos
 {
-    public class SuppliersFilterDTO : BaseFiler
+    public class SuppliersFilterDTO : BaseFilter
     {
 
         public int? Id { get; set; }

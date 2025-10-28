@@ -46,6 +46,8 @@ var app = builder.Build();
 
 app.UseGlobalExceptionMiddleware();
 
+app.UseCors("AllowCors");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -85,8 +87,6 @@ app.MapGet("/api/health/db", async (IConfiguration config) =>
         );
     }
 });
-
-app.UseCors("AllowCors");
 
 app.UseHttpsRedirection();
 

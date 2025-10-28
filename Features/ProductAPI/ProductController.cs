@@ -19,29 +19,29 @@ public class ProductController : Controller
         _service = service;
     }
     
+    // [HttpGet]
+    // public async Task<IActionResult> GetPagesOfProductAPI(
+    //     [FromQuery] PageRequest pageRequest
+    // )
+    // {
+    //     var result = await _service.getPageableProduct(null, pageRequest);
+    //
+    //     var response = new APIResponse<Object>(
+    //         HttpStatusCode.OK.value(),
+    //         "Get product successfully",
+    //         result.Content
+    //     ).setMetadata(new
+    //     {
+    //         pageNumber = result.PageNumber,
+    //         pageSize = result.PageSize,
+    //         totalPages = result.TotalPages
+    //     });
+    //     
+    //     return StatusCode(response.statusCode, response);
+    // }
+    
     [HttpGet]
     public async Task<IActionResult> GetPagesOfProductAPI(
-        [FromQuery] PageRequest pageRequest
-    )
-    {
-        var result = await _service.getPageableProduct(null, pageRequest);
-
-        var response = new APIResponse<Object>(
-            HttpStatusCode.OK.value(),
-            "Get product successfully",
-            result.Content
-        ).setMetadata(new
-        {
-            pageNumber = result.PageNumber,
-            pageSize = result.PageSize,
-            totalPages = result.TotalPages
-        });
-        
-        return StatusCode(response.statusCode, response);
-    }
-    
-    [HttpGet("search")]
-    public async Task<IActionResult> SearchPagesOfdMangaAPI(
         [FromQuery] ProductFilterDTO dtoFilter,
         [FromQuery] PageRequest pageRequest
     )
@@ -51,7 +51,7 @@ public class ProductController : Controller
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),
             "Get product successfully",
-            result
+            result.Content
         ).setMetadata(new
         {
             pageNumber = result.PageNumber,
