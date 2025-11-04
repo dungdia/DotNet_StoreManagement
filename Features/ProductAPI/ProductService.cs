@@ -7,6 +7,7 @@ using DotNet_StoreManagement.Features.ProductAPI.dtos;
 using DotNet_StoreManagement.Features.ProductAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
+using DotNet_StoreManagement.SharedKernel.persistence;
 using DotNet_StoreManagement.SharedKernel.utils;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -28,18 +29,26 @@ public class ProductService
     public async Task<Page<Product>> getPageableProduct(ProductFilterDTO? filterDto, PageRequest pageRequest)
     {
         IQueryable<Product> query = _repo.GetQueryable();
-        
-        query = _repo.FilterString(query, "ProductName", filterDto?.ProductName, FilterType.CONTAINS);
-        query = _repo.FilterString(query, "Barcode", filterDto?.Barcode, FilterType.CONTAINS);
-        query = _repo.FilterString(query, "Unit", filterDto?.Unit, FilterType.CONTAINS);
-        
-        return await _repo.FindAllPageAsync_V2(
+
+        query = query.Filter("ProductName", filterDto?.ProductName, FilterType.CONTAINS)
+            .Filter("Barcode", filterDto?.Barcode, FilterType.CONTAINS)
+            .Filter("Unit", filterDto?.Unit, FilterType.CONTAINS)
+            .RangeValue("Price", filterDto?.MinPrice, filterDto?.MaxPrice);
+            
+        return await _repo.FindAllPageAsync(
             query,
-            null,
-            null,
             pageRequest.PageNumber,
             pageRequest.PageSize
         );
+    }
+
+    public async Task<Object?> getProductById(int id)
+    {
+        var product = await _repo.FindProductById(id);
+        
+        if (product == null) throw APIException.BadRequest("San pham khong ton tai");
+        
+        return product;
     }
 
     public async Task<Product> UploadProduct(ProductDTO dto)

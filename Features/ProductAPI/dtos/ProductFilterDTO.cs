@@ -11,7 +11,9 @@ public class ProductFilterDTO
 
     public string? Barcode { get; set; } 
 
-    public decimal? Price { get; set; }
+    public decimal? MinPrice { get; set; }
+    
+    public decimal? MaxPrice { get; set; }
 
     public string? Unit { get; set; } 
     

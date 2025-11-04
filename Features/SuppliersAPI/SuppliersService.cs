@@ -8,6 +8,7 @@ using DotNet_StoreManagement.Features.SuppliersAPI.dtos;
 using DotNet_StoreManagement.Features.SuppliersAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
+using DotNet_StoreManagement.SharedKernel.persistence;
 
 namespace DotNet_StoreManagement.Features.SuppliersAPI
 {
@@ -37,16 +38,15 @@ namespace DotNet_StoreManagement.Features.SuppliersAPI
         {
             IQueryable<Supplier> query = _repo.GetQueryable();
 
-            query = _repo.FilterString(query, "SupplierId", filterDto?.Id.ToString(), FilterType.EQUAL);
-            query = _repo.FilterString(query, "Name", filterDto?.Name, FilterType.CONTAINS);
-            query = _repo.FilterString(query, "Phone", filterDto?.Phone, FilterType.CONTAINS);
-            query = _repo.FilterString(query, "Email", filterDto?.Email, FilterType.CONTAINS);
-            query = _repo.FilterString(query, "Address", filterDto?.Address, FilterType.CONTAINS);
+            query = query
+                .Filter("SupplierId", filterDto?.Id.ToString(), FilterType.EQUAL)
+                .Filter("Name", filterDto?.Name, FilterType.CONTAINS)
+                .Filter("Phone", filterDto?.Phone, FilterType.CONTAINS)
+                .Filter("Email", filterDto?.Email, FilterType.CONTAINS)
+                .Filter("Address", filterDto?.Address, FilterType.CONTAINS);
 
-            return await _repo.FindAllPageAsync_V2(
+            return await _repo.FindAllPageAsync(
                 query,
-                filterDto?.SortBy,
-                filterDto?.OrderBy,
                 pageRequest.PageNumber,
                 pageRequest.PageSize
             );

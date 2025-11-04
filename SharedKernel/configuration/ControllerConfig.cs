@@ -6,7 +6,11 @@ namespace DotNet_StoreManagement.SharedKernel.configuration;
 public static class ControllerConfig
 {
     public static IServiceCollection ControllerConfigExtension(this IServiceCollection services, IConfiguration config)
-    {        
+    {     
+        services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+            });
         services.AddControllers(options =>
         {
             // options.Filters.Add<ValidationFilter>();

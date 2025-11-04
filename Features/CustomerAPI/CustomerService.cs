@@ -9,6 +9,7 @@ using DotNet_StoreManagement.Features.CustomerAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
 using System.Linq.Expressions;
+using DotNet_StoreManagement.SharedKernel.persistence;
 
 namespace DotNet_StoreManagement.Features.CustomerAPI;
     [Service]    
@@ -26,16 +27,15 @@ public class CustomerService
     public async Task<Page<Customer>> GetPageableCustomerAsync(CustomerFilterDTO? dtoFilter, PageRequest pageRequest)
     {
         IQueryable<Customer> query = _repo.GetQueryable();
-
-        query = _repo.FilterString(query, "CustomerId", dtoFilter?.CustomerId.ToString(),FilterType.EQUAL);
-        query = _repo.FilterString(query, "Name", dtoFilter?.Name, FilterType.CONTAINS);
-        query = _repo.FilterString(query, "Phone", dtoFilter?.Phone, FilterType.CONTAINS);
-        query = _repo.FilterString(query, "Email", dtoFilter?.Email, FilterType.CONTAINS);
-        query = _repo.FilterString(query, "Address", dtoFilter?.Address, FilterType.CONTAINS);
-        return await _repo.FindAllPageAsync_V2(
+        
+        query = query
+            .Filter("Name", dtoFilter?.Name, FilterType.CONTAINS)
+            .Filter("Phone", dtoFilter?.Phone, FilterType.CONTAINS)
+            .Filter("Email", dtoFilter?.Email, FilterType.CONTAINS)
+            .Filter("Address", dtoFilter?.Address, FilterType.CONTAINS);
+        
+        return await _repo.FindAllPageAsync(
             query,
-            dtoFilter?.SortBy,
-            dtoFilter?.OrderBy,
             pageRequest.PageNumber,
             pageRequest.PageSize
         );

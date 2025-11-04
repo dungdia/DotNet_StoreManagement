@@ -105,8 +105,6 @@ namespace DotNet_StoreManagement.Features.PromotionAPI
                 throw new APIException(HttpStatusCode.NotFound.value(), "Promotion not found");
             }
 
-
-
             var result = await promotionRepo.DeleteAndSaveAsync(existingPromotion);
             return result;
         }

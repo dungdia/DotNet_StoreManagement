@@ -11,7 +11,6 @@ namespace DotNet_StoreManagement.Features.ProductAPI;
 public class ProductRepository : DPARepository<Product, int>, IProductRepository
 {
     public AppDbContext _context { get; set; }
-
     public ProductRepository(AppDbContext context) : base(context)
     {
         _context = context;
@@ -39,5 +38,31 @@ public class ProductRepository : DPARepository<Product, int>, IProductRepository
             where p.Barcode == product.Barcode && p.ProductId != id
             select p
         ).FirstOrDefaultAsync();
+    }
+    
+    public async Task<Object?> FindProductById(int id)
+    {
+        var result = await (from p in _context.Products
+                join s in _context.Suppliers on p.SupplierId equals s.SupplierId
+                where p.ProductId == id
+                select new
+                {
+                    p.ProductId,
+                    p.ProductName,
+                    p.Barcode,
+                    p.Unit,
+                    p.Price,
+                    p.CreatedAt,
+                    p.ProductImg,
+                    Supplier = new
+                    {
+                        s.Name,
+                        s.Phone,
+                        s.Email,
+                        s.Address
+                    }
+                })
+            .FirstOrDefaultAsync();
+        return result;
     }
 }
