@@ -42,6 +42,15 @@ public class ProductService
         );
     }
 
+    public async Task<Object?> getProductById(int id)
+    {
+        var product = await _repo.FindProductById(id);
+        
+        if (product == null) throw APIException.BadRequest("San pham khong ton tai");
+        
+        return product;
+    }
+
     public async Task<Product> UploadProduct(ProductDTO dto)
     {
         var product = _mapper.Map<Product>(dto);

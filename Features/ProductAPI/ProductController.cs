@@ -62,8 +62,24 @@ public class ProductController : Controller
         return StatusCode(response.statusCode, response);
     }
     
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetProductByIdAPI(
+        [FromRoute] int id    
+    )
+    {
+        var result = await _service.getProductById(id);
+        
+        var response = new APIResponse<Object>(
+            HttpStatusCode.OK.value(),
+            "Upload product successfully",
+            result!
+        );
+        
+        return StatusCode(response.statusCode, response);
+    }
+    
     [HttpPost]
-    public async Task<IActionResult> UploadMangaAPI(
+    public async Task<IActionResult> UploadProductAPI(
         [FromBody] ProductDTO dto    
     )
     {
