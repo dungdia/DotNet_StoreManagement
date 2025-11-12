@@ -19,7 +19,7 @@ public class PaymentController : Controller
 
     [HttpGet]
     public async Task<IActionResult> GetPagesOfPaymentAPI(
-        [FromQuery] PaymentFilter? dtoFilter,
+        [FromQuery] PaymentFilterDTO? dtoFilter,
         [FromQuery] PageRequest pageRequest
     )
     {

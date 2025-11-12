@@ -5,5 +5,5 @@ namespace DotNet_StoreManagement.Features.PaymentAPI.impl;
 
 public interface IPaymentRepository : IDPARepository<Payment, int>
 {
-    
+    IQueryable<Payment> GetQueryable();
 }

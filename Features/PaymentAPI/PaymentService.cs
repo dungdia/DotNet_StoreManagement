@@ -2,10 +2,12 @@
 using AutoMapper;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.Domain.entities.@base;
+using DotNet_StoreManagement.Domain.enums;
 using DotNet_StoreManagement.Features.PaymentAPI.dtos;
 using DotNet_StoreManagement.Features.PaymentAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
+using DotNet_StoreManagement.SharedKernel.persistence;
 using DotNet_StoreManagement.SharedKernel.utils;
 
 namespace DotNet_StoreManagement.Features.PaymentAPI;
@@ -27,48 +29,16 @@ public class PaymentService
         return await _repo.GetAllAsync();
     }
 
-    public async Task<Page<Payment>> GetPageablePayments(PaymentFilter? dtoFilter, PageRequest pageRequest)
+    public async Task<Page<Payment>> GetPageablePayments(PaymentFilterDTO? dtoFilter, PageRequest pageRequest)
     {
-        Expression<Func<Payment, bool>> filter = p => true;
+        IQueryable<Payment> query = _repo.GetQueryable();
 
-        if (dtoFilter != null)
-        {
-            if (dtoFilter.OrderId.HasValue)
-            {
-                filter = p => p.OrderId == dtoFilter.OrderId.Value;
-            }
-
-            if (!string.IsNullOrEmpty(dtoFilter.PaymentMethod))
-            {
-                filter = p => p.PaymentMethod != null && 
-                             p.PaymentMethod.ToLower().Contains(dtoFilter.PaymentMethod.ToLower());
-            }
-
-            if (dtoFilter.MinAmount.HasValue)
-            {
-                var previousFilter = filter;
-                filter = p => previousFilter.Compile()(p) && p.Amount >= dtoFilter.MinAmount.Value;
-            }
-
-            if (dtoFilter.MaxAmount.HasValue)
-            {
-                var previousFilter = filter;
-                filter = p => previousFilter.Compile()(p) && p.Amount <= dtoFilter.MaxAmount.Value;
-            }
-
-            if (dtoFilter.PaymentDate.HasValue)
-            {
-                var date = dtoFilter.PaymentDate.Value.Date;
-                var previousFilter = filter;
-                filter = p => previousFilter.Compile()(p) && 
-                             p.PaymentDate.HasValue && 
-                             p.PaymentDate.Value.Date == date;
-            }
-        }
+        query = query.Filter("PaymentMethod", dtoFilter?.PaymentMethod, FilterType.CONTAINS)
+            .RangeValue("Amount", dtoFilter?.MinAmount, dtoFilter?.MaxAmount)
+            .RangeDate("PaymentDate", dtoFilter?.StartDate, dtoFilter?.EndDate);
 
         return await _repo.FindAllPageAsync(
-            filter,
-            null,
+            query,
             pageRequest.PageNumber,
             pageRequest.PageSize
         );
