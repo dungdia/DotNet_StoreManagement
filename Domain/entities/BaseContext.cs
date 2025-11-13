@@ -44,7 +44,7 @@ public partial class BaseContext : DbContext
             entity.ToTable("categories");
 
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
-            entity.Property(e => e.CategoryName)
+            entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("category_name");
         });
