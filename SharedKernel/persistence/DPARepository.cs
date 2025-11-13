@@ -16,7 +16,7 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
         _context = context;
         _dbSet = context.Set<TEntity>();
     }
-    
+
     public async Task<TEntity?> GetByIdAsync(TKey id)
     {
         return await _dbSet.FindAsync(id);
@@ -55,7 +55,7 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
         return await _context.SaveChangesAsync();
     }
 
-    public Task DeleteAsync(TEntity entity) 
+    public Task DeleteAsync(TEntity entity)
     {
         _dbSet.Remove(entity);
         return Task.CompletedTask;
@@ -73,60 +73,68 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
     }
 
     public async Task<Page<TEntity>> FindAllPageAsync(
-        Expression<Func<TEntity, bool>>? filter = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        int pageNumber = 1,
-        int pageSize = 5
-    )
+      Expression<Func<TEntity, bool>>? filter = null,
+      Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+      int pageNumber = 1,
+      int pageSize = 5
+ )
     {
         IQueryable<TEntity> query = _dbSet;
-        
+
         if (filter != null)
         {
             query = query.Where(filter);
         }
-        
-        var total = await query.CountAsync();
+
+        // Lấy tổng số phần tử trước khi phân trang và sắp xếp
+        var totalElements = await query.CountAsync();
 
         if (orderBy != null)
         {
             query = orderBy(query);
         }
-        
+
+
         var content = await query
-            .Skip((pageNumber - 1) * pageNumber)
+            .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .AsNoTracking()
             .ToListAsync();
-        
+
+        var totalPages = (int)Math.Ceiling((double)totalElements / pageSize);
+
         return new Page<TEntity>
         {
             Content = content,
             PageNumber = pageNumber,
             PageSize = pageSize,
-            TotalPages = total
+            TotalPages = totalPages,
+            TotalElements = totalElements
         };
     }
 
     public async Task<Page<TEntity>> FindAllPageAsync(
-        IQueryable<TEntity> query,
-        int pageNumber = 1, 
-        int pageSize = 5
-    )
-    {   
-        var totalPages = await query.CountAsync();
-        
+      IQueryable<TEntity> query,
+      int pageNumber = 1,
+      int pageSize = 5
+ )
+    {
+        var totalElements = await query.CountAsync();
+
         var content = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-        
+
+        var totalPages = (int)Math.Ceiling((double)totalElements / pageSize);
+
         return new Page<TEntity>
         {
             Content = content,
             PageNumber = pageNumber,
             PageSize = pageSize,
-            TotalPages = totalPages
+            TotalPages = totalPages,
+            TotalElements = totalElements
         };
     }
 }
