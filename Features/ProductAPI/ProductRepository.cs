@@ -2,6 +2,7 @@
 using DotNet_StoreManagement.Features.ProductAPI.dtos;
 using DotNet_StoreManagement.Features.ProductAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
+using DotNet_StoreManagement.SharedKernel.exception;
 using DotNet_StoreManagement.SharedKernel.persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +33,6 @@ public class ProductRepository : DPARepository<Product, int>, IProductRepository
                 select p
             ).FirstOrDefaultAsync();
         }
-
         return await (
             from p in _context.Products
             where p.Barcode == product.Barcode && p.ProductId != id
@@ -40,29 +40,24 @@ public class ProductRepository : DPARepository<Product, int>, IProductRepository
         ).FirstOrDefaultAsync();
     }
     
-    public async Task<Object?> FindProductById(int id)
+    public async Task<ICollection<Dictionary<string, object>>?> FindProductDetail(int id)
     {
-        var result = await (from p in _context.Products
-                join s in _context.Suppliers on p.SupplierId equals s.SupplierId
-                where p.ProductId == id
-                select new
-                {
-                    p.ProductId,
-                    p.ProductName,
-                    p.Barcode,
-                    p.Unit,
-                    p.Price,
-                    p.CreatedAt,
-                    p.ProductImg,
-                    Supplier = new
-                    {
-                        s.Name,
-                        s.Phone,
-                        s.Email,
-                        s.Address
-                    }
-                })
-            .FirstOrDefaultAsync();
-        return result;
+        string query = """
+                       SELECT 
+                        p.product_name as product_name, p.barcode, p.price, p.unit, 
+                        s.name as supplier_name
+                       FROM products p 
+                       JOIN suppliers s ON s.supplier_id = p.supplier_id
+                       JOIN categories c ON c.category_id = p.category_id
+                       WHERE p.product_id = ?;
+                       """;
+        try
+        {
+            return await _context.executeSqlRawAsync(query, id);
+        }
+        catch (Exception e)
+        {
+            throw APIException.InternalServerError(e.Message);
+        }
     }
 }

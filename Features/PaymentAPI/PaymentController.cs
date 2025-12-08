@@ -3,6 +3,7 @@ using DotNet_StoreManagement.Domain.entities.@base;
 using DotNet_StoreManagement.Features.PaymentAPI.dtos;
 using DotNet_StoreManagement.SharedKernel.utils;
 using Microsoft.AspNetCore.Mvc;
+using VNPAY.Models;
 
 namespace DotNet_StoreManagement.Features.PaymentAPI;
 
@@ -10,11 +11,13 @@ namespace DotNet_StoreManagement.Features.PaymentAPI;
 [Route("api/v1/payment/")]
 public class PaymentController : Controller
 {
+    private readonly ILogger<PaymentController> _logger;
     private readonly PaymentService _service;
 
-    public PaymentController(PaymentService service)
+    public PaymentController(PaymentService service,ILogger<PaymentController> logger)
     {
         _service = service;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -39,28 +42,6 @@ public class PaymentController : Controller
         return Ok(response);
     }
 
-    // [HttpGet("search")]
-    // public async Task<IActionResult> SearchPagesOfPaymentAPI(
-    //     [FromQuery] PaymentFilter dtoFilter,
-    //     [FromQuery] PageRequest pageRequest
-    // )
-    // {
-    //     var result = await _service.GetPageablePayments(dtoFilter, pageRequest);
-    //
-    //     var response = new APIResponse<Object>(
-    //         HttpStatusCode.OK.value(),
-    //         "Get payments successfully",
-    //         result.Content
-    //     ).setMetadata(new
-    //     {
-    //         pageNumber = result.PageNumber,
-    //         pageSize = result.PageSize,
-    //         totalPages = result.TotalPages
-    //     });
-    //
-    //     return Ok(response);
-    // }
-
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPaymentByIdAPI()
     {
@@ -82,7 +63,7 @@ public class PaymentController : Controller
             result
         );
 
-        return Ok(response);
+        return StatusCode(response.statusCode, response);
     }
 
     [HttpPost]
@@ -98,6 +79,40 @@ public class PaymentController : Controller
             result
         );
 
-        return Ok(response);
+        return StatusCode(response.statusCode, response);
+    }
+
+    [HttpPost("vnpay-payment")]
+    public IActionResult createPaymentAPI([FromBody] VnpayPaymentRequest request)
+    {
+        var result = _service.CreatePaymentURL(request);
+
+        var response = new APIResponse<Object>(
+            HttpStatusCode.OK.value(),
+            "Tạo thanh toán thành công",
+            result  
+        );
+
+        return StatusCode(response.statusCode, response);
+    }
+
+    [HttpGet("vnpay-callback")]
+    public IActionResult callbackPaymentAPI()
+    {
+        var result = _service.callbackPayment(this.Request);
+        
+        _logger.LogInformation("Payment ID: {PaymentId}", result.PaymentId);
+        _logger.LogInformation("VNPAY Transaction ID: {VnpayTransactionId}", result.VnpayTransactionId);
+        _logger.LogInformation("Timestamp: {Timestamp}", result.Timestamp);
+        _logger.LogInformation("Card Type: {CardType}", result.CardType);
+        _logger.LogInformation("Banking Info: {BankingInfo}", result.BankingInfor != null ? $"{result.BankingInfor.BankCode} - {result.BankingInfor.BankTransactionId}" : "N/A");
+
+        var response = new APIResponse<Object>(
+            HttpStatusCode.OK.value(),
+            "",
+            result
+        );
+        
+        return StatusCode(response.statusCode, response);
     }
 }
