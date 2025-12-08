@@ -34,7 +34,7 @@ namespace DotNet_StoreManagement.Features.CustomerAPI
                 totalPages = result.TotalPages
             });
 
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpPost]
@@ -48,7 +48,7 @@ namespace DotNet_StoreManagement.Features.CustomerAPI
                 HttpStatusCode.OK.value(),
                 "Create customer successfully",
                 result);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpPut("{id}")]
@@ -62,8 +62,8 @@ namespace DotNet_StoreManagement.Features.CustomerAPI
                 HttpStatusCode.OK.value(),
                 "Update customer successfully",
                 result);
-            
-            return Ok(response);
+
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpDelete("{id}")]
@@ -75,8 +75,8 @@ namespace DotNet_StoreManagement.Features.CustomerAPI
                 HttpStatusCode.OK.value(),
                 "Delete customer successfully",
                 result);
-            
-            return Ok(response);
+
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpGet("Search")]
@@ -95,7 +95,7 @@ namespace DotNet_StoreManagement.Features.CustomerAPI
                 pageSize = result.PageSize,
                 totalPages = result.TotalPages
             });
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
     }
 }

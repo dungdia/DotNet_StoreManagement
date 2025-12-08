@@ -1,4 +1,4 @@
-﻿namespace DotNet_StoreManagement.Domain.entities.@base;
+namespace DotNet_StoreManagement.Domain.entities.@base;
 
 public class Page<T>
 {

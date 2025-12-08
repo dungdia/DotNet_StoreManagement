@@ -29,6 +29,7 @@ public class CustomerService
         IQueryable<Customer> query = _repo.GetQueryable();
         
         query = query
+            .Filter("Id", dtoFilter?.CustomerId.ToString(), FilterType.CONTAINS)
             .Filter("Name", dtoFilter?.Name, FilterType.CONTAINS)
             .Filter("Phone", dtoFilter?.Phone, FilterType.CONTAINS)
             .Filter("Email", dtoFilter?.Email, FilterType.CONTAINS)
