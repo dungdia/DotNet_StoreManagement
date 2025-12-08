@@ -19,27 +19,6 @@ public class ProductController : Controller
         _service = service;
     }
     
-    // [HttpGet]
-    // public async Task<IActionResult> GetPagesOfProductAPI(
-    //     [FromQuery] PageRequest pageRequest
-    // )
-    // {
-    //     var result = await _service.getPageableProduct(null, pageRequest);
-    //
-    //     var response = new APIResponse<Object>(
-    //         HttpStatusCode.OK.value(),
-    //         "Get product successfully",
-    //         result.Content
-    //     ).setMetadata(new
-    //     {
-    //         pageNumber = result.PageNumber,
-    //         pageSize = result.PageSize,
-    //         totalPages = result.TotalPages
-    //     });
-    //     
-    //     return StatusCode(response.statusCode, response);
-    // }
-    
     [HttpGet]
     public async Task<IActionResult> GetPagesOfProductAPI(
         [FromQuery] ProductFilterDTO dtoFilter,
@@ -63,15 +42,15 @@ public class ProductController : Controller
     }
     
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductByIdAPI(
+    public async Task<IActionResult> GetProductDetailAPI(
         [FromRoute] int id    
     )
     {
-        var result = await _service.getProductById(id);
+        var result = await _service.getProductDetail(id);
         
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),
-            "Upload product successfully",
+            "Get product successfully",
             result!
         );
         
@@ -101,23 +80,23 @@ public class ProductController : Controller
     {
         var id = RouteData.Values["id"]?.ToString()!;
         
-        var result = await _service.EditProduct(Int32.Parse(id), dto);
+        var result = await _service.editProduct(Int32.Parse(id), dto);
         
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),
             "Edit product successfully",
-            result
+            result!
         );
         
         return StatusCode(response.statusCode, response);
     }
     
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProductAPI()
+    public async Task<IActionResult> DeleteProductAPI(
+        [FromRoute] int id     
+    )
     {
-        var id = RouteData.Values["id"]?.ToString()!;
-        
-        var result = await _service.DeleteProduct(Int32.Parse(id));
+        var result = await _service.deleteProduct(id);
         
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),

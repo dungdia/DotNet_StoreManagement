@@ -2,7 +2,6 @@ using System.Reflection;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
-using DotNet_StoreManagement.SharedKernel.filters;
 using DotNet_StoreManagement.SharedKernel.persistence;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -12,6 +11,9 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .WriteTo.Console()
     .CreateLogger();
+
+TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,7 @@ var config = builder.Configuration;
 builder.Services.ControllerConfigExtension(config);
 builder.Services.DatabaseConfigExtension(config);
 builder.Services.SecurityConfigExtension(config);
+builder.Services.VNConfig(config);
 
 var app = builder.Build();
 

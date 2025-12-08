@@ -8,5 +8,5 @@ public interface IProductRepository : IDPARepository<Product, int>
 {
     IQueryable<Product> GetQueryable();
     Task<Product?> FindBarcode(int id, ProductDTO product);
-    Task<Object?> FindProductById(int id);
+    Task<ICollection<Dictionary<string, object>>?> FindProductDetail(int id);
 }
