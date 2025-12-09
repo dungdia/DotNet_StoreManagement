@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using DotNet_StoreManagement.Domain.entities.@base;
 using DotNet_StoreManagement.Domain.enums;
 using DotNet_StoreManagement.SharedKernel.persistence.impl;
