@@ -36,6 +36,11 @@ public class CategoryService
         );
     }
 
+    public async Task<ICollection<Category>> GetAllCategoriesAsync()
+    {
+        return await _repo.GetAllAsync();
+    }
+
     public async Task<Category> CreateCategoryAsync(CategoryDTO dto)
     {
         var category = _mapper.Map<Category>(dto);

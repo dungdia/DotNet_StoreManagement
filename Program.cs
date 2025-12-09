@@ -6,6 +6,8 @@ using DotNet_StoreManagement.SharedKernel.persistence;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -44,6 +46,16 @@ builder.Services.ControllerConfigExtension(config);
 builder.Services.DatabaseConfigExtension(config);
 builder.Services.SecurityConfigExtension(config);
 builder.Services.VNConfig(config);
+
+//var cloudinaryConfig = builder.Configuration.GetSection("Cloudinary");
+//Account account = new Account(
+//    cloudinaryConfig["CloudName"],
+//    cloudinaryConfig["ApiKey"],
+//    cloudinaryConfig["ApiSecret"]
+//);
+//Cloudinary cloudinary = new Cloudinary(account);
+//builder.Services.AddSingleton(cloudinary);
+//builder.Services.AddControllers();
 
 var app = builder.Build();
 
