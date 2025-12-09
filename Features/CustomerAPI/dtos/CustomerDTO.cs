@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using DotNet_StoreManagement.Domain.entities;
 using System.ComponentModel.DataAnnotations;
 

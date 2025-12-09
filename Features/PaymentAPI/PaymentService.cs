@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
+using CloudinaryDotNet;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.Domain.entities.@base;
 using DotNet_StoreManagement.Domain.enums;
@@ -9,6 +10,9 @@ using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
 using DotNet_StoreManagement.SharedKernel.persistence;
 using DotNet_StoreManagement.SharedKernel.utils;
+using VNPAY;
+using VNPAY.Models;
+using VNPAY.Models.Exceptions;
 
 namespace DotNet_StoreManagement.Features.PaymentAPI;
 
@@ -17,11 +21,14 @@ public class PaymentService
 {
     private readonly IPaymentRepository _repo;
     private readonly IMapper _mapper;
-
-    public PaymentService(IPaymentRepository repo, IMapper mapper)
+    private IConfiguration _configuration;
+    private IVnpayClient vnpayClient;
+    
+    public PaymentService(IPaymentRepository repo, IMapper mapper, IVnpayClient vnpayClient)
     {
         _repo = repo;
         _mapper = mapper;
+        this.vnpayClient = vnpayClient;
     }
 
     public async Task<ICollection<Payment>> GetAllPayments()
@@ -48,7 +55,7 @@ public class PaymentService
     {
         var payment = _mapper.Map<Payment>(dto);
         payment.PaymentDate = DateTime.Now;
-
+        
         await _repo.AddAsync(payment);
         var affectedRows = await _repo.SaveChangesAsync();
 
@@ -57,26 +64,42 @@ public class PaymentService
 
         return payment;
     }
-
-    // public async Task<Payment?> EditPayment(int id, PaymentDTO dto)
-    // {
-    //     var payment = await _repo.GetByIdAsync(id);
-    //
-    //     if (payment == null) 
-    //         throw APIException.BadRequest("Can't find payment");
-    //
-    //     await _repo.UpdateAsync(_mapper.Map(dto, payment));
-    //     var affectedRows = await _repo.SaveChangesAsync();
-    //
-    //     if (affectedRows < 0) 
-    //         throw APIException.InternalServerError("Update payment failed");
-    //
-    //     return payment;
-    // }
     
 
     public async Task<Payment?> GetPaymentById(int id)
     {
         return await _repo.GetByIdAsync(id);
+    }
+
+    public String CreatePaymentURL(VnpayPaymentRequest request)
+    {
+        try
+        {
+            return vnpayClient.CreatePaymentUrl(request).Url;
+        }
+        catch (VnpayException e)
+        {
+            throw APIException.InternalServerError(e.Message);
+        }
+        catch (Exception e)
+        {
+            throw APIException.InternalServerError(e.Message);
+        }
+    }
+
+    public VnpayPaymentResult callbackPayment(HttpRequest request)
+    {
+        try
+        {   
+            return vnpayClient.GetPaymentResult(request);
+        }
+        catch (VnpayException e)
+        {
+            throw APIException.InternalServerError(e.Message);
+        }
+        catch (Exception e)
+        {
+            throw APIException.InternalServerError(e.Message);
+        }
     }
 }

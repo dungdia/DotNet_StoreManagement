@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Runtime.InteropServices.JavaScript;
 using AutoMapper;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.Domain.entities.@base;
@@ -8,9 +9,6 @@ using DotNet_StoreManagement.Features.ProductAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
 using DotNet_StoreManagement.SharedKernel.persistence;
-using DotNet_StoreManagement.SharedKernel.utils;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
 
 namespace DotNet_StoreManagement.Features.ProductAPI;
 
@@ -42,12 +40,21 @@ public class ProductService
         );
     }
 
-    public async Task<Object?> getProductById(int id)
+    // public async Task<dynamic?> getProductById(int id)
+    // {
+    //     var product = await _repo.FindProductById(id);
+    //
+    //     if (product == null) throw APIException.BadRequest($"Mã sản phẩm không tồn tại");
+    //
+    //     return product;
+    // }
+
+    public async Task<ProductDetailResponseDTO> getProductDetail(int id)
     {
-        var product = await _repo.FindProductById(id);
-        
-        if (product == null) throw APIException.BadRequest("San pham khong ton tai");
-        
+        var product = await _repo.FindProductDetail<ProductDetailResponseDTO>(id);
+    
+        if (product == null) throw APIException.BadRequest($"Mã sản phẩm không tồn tại");
+    
         return product;
     }
 
@@ -57,43 +64,43 @@ public class ProductService
         product.CreatedAt = DateTime.Now;
         
         var existedBarcode = await _repo.FindBarcode(0, dto);
-        if (existedBarcode != null) throw APIException.BadRequest("Barcode da ton tai");
+        if (existedBarcode != null) throw APIException.BadRequest("Barcode đã tồn tại");
         
         await _repo.AddAsync(product);
         var affectedRows = await _repo.SaveChangesAsync();
         
-        if (affectedRows < 0) throw APIException.InternalServerError("Add failed");
+        if (affectedRows < 0) throw APIException.InternalServerError("Thêm sản phẩm thất bại");
         
         return product;
     }
     
-    public async Task<Product?> EditProduct(int id, ProductDTO dto)
+    public async Task<Product?> editProduct(int id, ProductDTO dto)
     {
         var product = await _repo.GetByIdAsync(id);
         
-        if (product == null) throw APIException.BadRequest("San pham khong ton tai");
+        if (product == null) throw APIException.BadRequest("Sản pẩm không tồn tại");
 
         var existedBarcode = await _repo.FindBarcode(id, dto);
-        
-        if (existedBarcode != null) throw APIException.BadRequest("Barcode da ton tai");
+        if (existedBarcode != null) throw APIException.BadRequest("Barcode đã tồn tại");
         
         await _repo.UpdateAsync(_mapper.Map(dto, product));
         var affectedRows = await _repo.SaveChangesAsync();
         
-        if(affectedRows < 0) throw new ApplicationException("Cap nhat san pham loi");
+        if(affectedRows < 0) throw new ApplicationException("Cập nhật sản phẩm thất bại");
         
         return product;
     }
     
-    public async Task<Product> DeleteProduct(int id)
+    public async Task<Product> deleteProduct(int id)
     {
         var product = await _repo.GetByIdAsync(id);
         
-        if (product == null) throw APIException.BadRequest("Can't find product");
+        if (product == null) throw APIException.BadRequest("Sản phẩm không tồn tại");
+        
         await _repo.DeleteAsync(product);
         var affectedRows = await _repo.SaveChangesAsync();
         
-        if(affectedRows < 0) throw APIException.InternalServerError("Add failed");
+        if(affectedRows < 0) throw APIException.InternalServerError("Xóa sản phẩm thất bại");
         return product;
     }
 }
