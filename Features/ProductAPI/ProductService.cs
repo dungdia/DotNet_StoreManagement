@@ -49,13 +49,13 @@ public class ProductService
     //     return product;
     // }
 
-    public async Task<Dictionary<string, object>?> getProductDetail(int id)
+    public async Task<ProductDetailResponseDTO> getProductDetail(int id)
     {
-        var product = await _repo.FindProductDetail(id);
+        var product = await _repo.FindProductDetail<ProductDetailResponseDTO>(id);
     
         if (product == null) throw APIException.BadRequest($"Mã sản phẩm không tồn tại");
     
-        return product.FirstOrDefault();
+        return product;
     }
 
     public async Task<Product> UploadProduct(ProductDTO dto)

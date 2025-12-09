@@ -72,41 +72,45 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
         return await _context.SaveChangesAsync();
     }
 
-    public async Task<Page<TEntity>> FindAllPageAsync(
-        Expression<Func<TEntity, bool>>? filter = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        int pageNumber = 1,
-        int pageSize = 5
-    )
-    {
-        IQueryable<TEntity> query = _dbSet;
-        
-        if (filter != null)
-        {
-            query = query.Where(filter);
-        }
-        
-        var total = await query.CountAsync();
-
-        if (orderBy != null)
-        {
-            query = orderBy(query);
-        }
-        
-        var content = await query
-            .Skip((pageNumber - 1) * pageNumber)
-            .Take(pageSize)
-            .AsNoTracking()
-            .ToListAsync();
-        
-        return new Page<TEntity>
-        {
-            Content = content,
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            TotalPages = total
-        };
-    }
+    // public async Task<Page<TEntity>> FindAllPageAsync(
+    //     Expression<Func<TEntity, bool>>? filter = null,
+    //     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+    //     int pageNumber = 1,
+    //     int pageSize = 5
+    // )
+    // {
+    //     IQueryable<TEntity> query = _dbSet;
+    //     
+    //     if (filter != null)
+    //     {
+    //         query = query.Where(filter);
+    //     }
+    //
+    //     if (orderBy != null)
+    //     {
+    //         query = orderBy(query);
+    //     }
+    //     
+    //     // tổng số bản ghi
+    //     int totalElements = await query.CountAsync();
+    //     // số trang tối đa trả về
+    //     int totalPages = (int)Math.Ceiling((double)totalElements / pageSize);
+    //     
+    //     var content = await query
+    //         .Skip((pageNumber - 1) * pageSize)
+    //         .Take(pageSize)
+    //         .AsNoTracking()
+    //         .ToListAsync();
+    //     
+    //     return new Page<TEntity>
+    //     {
+    //         Content = content,
+    //         PageNumber = pageNumber,
+    //         PageSize = pageSize,
+    //         TotalPages = totalPages,
+    //         TotalElements = totalElements
+    //     };
+    // }
 
     public async Task<Page<TEntity>> FindAllPageAsync(
         IQueryable<TEntity> query,
@@ -114,8 +118,12 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
         int pageSize = 5
     )
     {   
-        var totalPages = await query.CountAsync();
+        // tổng số bản ghi
+        int totalElements = await query.CountAsync();
+        // số trang tối đa trả về
+        int totalPages = (int)Math.Floor((double)totalElements / pageSize);
         
+        // trả nội dung phân trang
         var content = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
@@ -126,7 +134,8 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
             Content = content,
             PageNumber = pageNumber,
             PageSize = pageSize,
-            TotalPages = totalPages
+            TotalPages = totalPages,
+            TotalElements = totalElements
         };
     }
 }

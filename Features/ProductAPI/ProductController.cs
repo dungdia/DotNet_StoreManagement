@@ -35,7 +35,8 @@ public class ProductController : Controller
         {
             pageNumber = result.PageNumber,
             pageSize = result.PageSize,
-            totalPages = result.TotalPages
+            totalPages = result.TotalPages,
+            totalElements = result.TotalElements
         });
         
         return StatusCode(response.statusCode, response);

@@ -40,12 +40,13 @@ public class ProductRepository : DPARepository<Product, int>, IProductRepository
         ).FirstOrDefaultAsync();
     }
     
-    public async Task<ICollection<Dictionary<string, object>>?> FindProductDetail(int id)
+    public async Task<T?> FindProductDetail<T>(int id) where T : class, new()
     {
         string query = """
                        SELECT 
-                        p.product_name as product_name, p.barcode, p.price, p.unit, 
-                        s.name as supplier_name
+                        p.product_name as productName, p.barcode, p.price, p.unit, 
+                        s.name as supplierName,
+                        c.category_name as categoryName
                        FROM products p 
                        JOIN suppliers s ON s.supplier_id = p.supplier_id
                        JOIN categories c ON c.category_id = p.category_id
@@ -53,7 +54,8 @@ public class ProductRepository : DPARepository<Product, int>, IProductRepository
                        """;
         try
         {
-            return await _context.executeSqlRawAsync(query, id);
+            var result = await _context.executeSqlRawAsync<T>(query, id);
+            return result.FirstOrDefault();
         }
         catch (Exception e)
         {
