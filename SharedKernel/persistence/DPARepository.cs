@@ -121,7 +121,7 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
         // tổng số bản ghi
         int totalElements = await query.CountAsync();
         // số trang tối đa trả về
-        int totalPages = (int)Math.Floor((double)totalElements / pageSize);
+        int totalPages = (int)Math.Ceiling((double)totalElements / pageSize);
         
         // trả nội dung phân trang
         var content = await query
