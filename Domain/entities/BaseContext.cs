@@ -44,7 +44,7 @@ public partial class BaseContext : DbContext
             entity.ToTable("categories");
 
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
-            entity.Property(e => e.Name)
+            entity.Property(e => e.CategoryName)
                 .HasMaxLength(100)
                 .HasColumnName("category_name");
         });
@@ -56,11 +56,12 @@ public partial class BaseContext : DbContext
             entity.ToTable("customers");
 
             entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+            entity.Property(e => e.AccountId).HasColumnName("account_id");
             entity.Property(e => e.Address)
                 .HasColumnType("text")
                 .HasColumnName("address");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
             entity.Property(e => e.Email)
@@ -179,7 +180,7 @@ public partial class BaseContext : DbContext
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
             entity.Property(e => e.ProductImg)
-                .HasMaxLength(50)
+                .HasMaxLength(255)
                 .HasColumnName("product_img");
             entity.Property(e => e.ProductName)
                 .HasMaxLength(100)
