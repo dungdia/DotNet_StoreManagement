@@ -64,7 +64,23 @@ public class AuthController : ControllerBase
     
         return StatusCode(response.statusCode, response);
     }
-    
+
+    [HttpGet("auth/token_payload")]
+    public async Task<IActionResult> getALlClaim(
+        [FromHeader(Name = "Authorization")] String authorization
+    )
+    {
+        var token = authorization.Replace("Bearer ", "");
+        var result = await _authService.getAllClaim(token);
+        
+        var response = new APIResponse<Object>(
+            HttpStatusCode.OK.value(),
+            "Token is valid",
+            result?.Payload
+        );
+        return StatusCode(response.statusCode, response);
+    }
+
     // [HttpGet("auth/secure-by-permission")]
     // [Permission("Export")]
     // public ActionResult<Object> exportPDF()

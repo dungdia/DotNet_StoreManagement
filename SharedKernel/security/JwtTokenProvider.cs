@@ -41,6 +41,7 @@ public class JwtTokenProvider
     {   
         var claims = new List<Claim>
         {
+            new Claim("userId", user.UserId.ToString()),
             new Claim(JwtRegisteredClaimNames.Sub, user.Username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim("role", user.Role!)
