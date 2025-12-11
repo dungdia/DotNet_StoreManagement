@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using AutoMapper;
+﻿using AutoMapper;
 using CloudinaryDotNet;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.Domain.entities.@base;
@@ -10,6 +9,8 @@ using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
 using DotNet_StoreManagement.SharedKernel.persistence;
 using DotNet_StoreManagement.SharedKernel.utils;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using VNPAY;
 using VNPAY.Models;
 using VNPAY.Models.Exceptions;
@@ -21,13 +22,15 @@ public class PaymentService
 {
     private readonly IPaymentRepository _repo;
     private readonly IMapper _mapper;
+    private readonly AppDbContext _context;
     private IConfiguration _configuration;
     private IVnpayClient vnpayClient;
     
-    public PaymentService(IPaymentRepository repo, IMapper mapper, IVnpayClient vnpayClient)
+    public PaymentService(IPaymentRepository repo, IMapper mapper, AppDbContext context, IVnpayClient vnpayClient)
     {
         _repo = repo;
         _mapper = mapper;
+        _context = context;
         this.vnpayClient = vnpayClient;
     }
 
@@ -102,4 +105,46 @@ public class PaymentService
             throw APIException.InternalServerError(e.Message);
         }
     }
+
+    public async Task UpdateTransactionRefAsync(int orderId, long transactionRef)
+    {
+        var payment = await _context.Payments
+                            .FirstOrDefaultAsync(p => p.OrderId == orderId);
+
+        if (payment != null)
+        {
+            // Bạn cần thêm cột TransactionRef vào Entity Payment nhé
+            payment.TransactionRef = transactionRef;
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task ConfirmPaymentSuccessAsync(long transactionRef)
+    {
+        var payment = await _context.Payments
+                                    .FirstOrDefaultAsync(p => p.TransactionRef == transactionRef);
+        if (payment == null) throw new Exception("Không tìm thấy giao dịch thanh toán");
+        if (payment.Status == "success") return;
+
+        payment.Status = "success";
+        var order = await _context.Orders.FindAsync(payment.OrderId);
+        if (order != null)
+        {
+            order.Status = "paid";
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task ConfirmPaymentFailedAsync(long transactionRef, string reason)
+    {
+        var payment = await _context.Payments
+                                    .FirstOrDefaultAsync(p => p.TransactionRef == transactionRef);
+        if (payment != null)
+        {
+            payment.Status = "failed";
+            await _context.SaveChangesAsync();
+        }
+    }
+
 }

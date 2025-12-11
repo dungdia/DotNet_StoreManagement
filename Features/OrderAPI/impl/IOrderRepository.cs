@@ -8,4 +8,5 @@ namespace DotNet_StoreManagement.Features.OrderAPI.impl;
 
 public interface IOrderRepository : IDPARepository<Order, int>
 {
+    public IQueryable<Order> GetQueryable();
 }

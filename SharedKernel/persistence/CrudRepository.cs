@@ -69,4 +69,11 @@ public class CrudRepository<TEntity, TKey> : ICrudRepository<TEntity, TKey> wher
     {
         return await _context.SaveChangesAsync();
     }
+
+    public async Task<ICollection<TEntity>> GetByFKIdAsync(string key, int id)
+    {
+        return await _dbSet
+        .Where(e => object.Equals(EF.Property<TKey>(e, key), id))
+        .ToListAsync();
+    }
 }
