@@ -22,6 +22,13 @@ public class DPARepository<TEntity, TKey> : IDPARepository<TEntity, TKey> where 
         return await _dbSet.FindAsync(id);
     }
 
+    public async Task<ICollection<TEntity>> GetByFKIdAsync(string key, int id)
+    {
+        return await _dbSet
+        .Where(e => object.Equals(EF.Property<TKey>(e, key), id))
+        .ToListAsync();
+    }
+
     public async Task<ICollection<TEntity>> GetAllAsync()
     {
         return await _dbSet.ToListAsync();

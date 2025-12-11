@@ -1,5 +1,7 @@
-﻿using System;
+﻿using DotNet_StoreManagement.Domain.enums;
+using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace DotNet_StoreManagement.Domain.entities;
 
@@ -14,4 +16,6 @@ public partial class Payment
     public string? PaymentMethod { get; set; }
 
     public DateTime? PaymentDate { get; set; }
-}
+    public string? Status { get; set; }
+    public long TransactionRef { get; set; }
+    }

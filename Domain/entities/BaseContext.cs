@@ -157,6 +157,13 @@ public partial class BaseContext : DbContext
                 .HasDefaultValueSql("'cash'")
                 .HasColumnType("enum('cash','card','bank_transfer','e-wallet')")
                 .HasColumnName("payment_method");
+            entity.Property(e => e.Status)
+                .HasDefaultValueSql("'pending'")
+                .HasColumnType("enum('pending','success','failed')")
+                .HasColumnName("status");
+            entity.Property(e => e.TransactionRef)
+                .HasColumnType("bigint")
+                .HasColumnName("transaction_ref");
         });
 
         modelBuilder.Entity<Product>(entity =>

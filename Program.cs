@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;

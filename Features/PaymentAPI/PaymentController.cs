@@ -97,7 +97,20 @@ public class PaymentController : Controller
     }
 
     [HttpGet("vnpay-callback")]
-    public IActionResult callbackPaymentAPI()
+    public IActionResult CallbackPaymentAPI(
+        [FromQuery(Name = "vnp_Amount")] long? vnpAmount,
+        [FromQuery(Name = "vnp_BankCode")] string? vnpBankCode,
+        [FromQuery(Name = "vnp_BankTranNo")] string? vnpBankTranNo,
+        [FromQuery(Name = "vnp_CardType")] string? vnpCardType,
+        [FromQuery(Name = "vnp_OrderInfo")] string? vnpOrderInfo,
+        [FromQuery(Name = "vnp_PayDate")] string? vnpPayDate,
+        [FromQuery(Name = "vnp_ResponseCode")] string? vnpResponseCode,
+        [FromQuery(Name = "vnp_TmnCode")] string? vnpTmnCode,
+        [FromQuery(Name = "vnp_TransactionNo")] string? vnpTransactionNo,
+        [FromQuery(Name = "vnp_TransactionStatus")] string? vnpTransactionStatus,
+        [FromQuery(Name = "vnp_TxnRef")] string? vnpTxnRef,
+        [FromQuery(Name = "vnp_SecureHash")] string? vnpSecureHash
+    )
     {
         var result = _service.callbackPayment(this.Request);
         

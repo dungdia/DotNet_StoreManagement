@@ -14,4 +14,9 @@ public class OrderRepository : DPARepository<Order, int>, IOrderRepository
     {
         _context = context;
     }
+
+    public IQueryable<Order> GetQueryable()
+    {
+        return _context.Orders;
+    }
 }

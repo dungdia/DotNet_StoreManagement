@@ -24,14 +24,14 @@ public class ProductService
         _mapper = mapper;
     }
     
-    public async Task<Page<Product>> getPageableProduct(ProductFilterDTO? filterDto, PageRequest pageRequest)
+    public async Task<Page<Product>> GetPageableProduct(ProductFilterDTO? filterDto, PageRequest pageRequest)
     {
         IQueryable<Product> query = _repo.GetQueryable();
 
-        query = query.Filter("ProductName", filterDto?.ProductName, FilterType.CONTAINS)
-            .Filter("Barcode", filterDto?.Barcode, FilterType.CONTAINS)
-            .Filter("Unit", filterDto?.Unit, FilterType.CONTAINS)
-            .RangeValue("Price", filterDto?.MinPrice, filterDto?.MaxPrice);
+        query = query.SearchMultipleField(filterDto.SearchTerm, "ProductName", "Barcode")
+            .RangeValue("Price", filterDto?.MinPrice, filterDto?.MaxPrice)
+            .FilterByList<Product, int>("CategoryId", filterDto.CategoryIds)
+            .ApplyOrdering(filterDto.SortBy, filterDto.SortDescending);
             
         return await _repo.FindAllPageAsync(
             query,

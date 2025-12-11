@@ -7,19 +7,16 @@ namespace DotNet_StoreManagement.Features.ProductAPI.dtos;
 
 public class ProductFilterDTO
 {
-    public string? ProductName { get; set; } 
-
-    public string? Barcode { get; set; } 
-
+    public string? SearchTerm { get; set; } = "";
+    
+    public List<int>? CategoryIds { get; set; } = new();
+    
     public decimal? MinPrice { get; set; }
     
     public decimal? MaxPrice { get; set; }
 
-    public string? Unit { get; set; } 
-    
-    public DateOnly? CreatedAt { get; set; }
-
-    public string? ProductImg { get; set; } 
+    public string? SortBy { get; set; } = "CreatedAt";
+    public bool SortDescending { get; set; } = false;
 }
 
 

@@ -25,7 +25,7 @@ public class ProductController : Controller
         [FromQuery] PageRequest pageRequest
     )
     {
-        var result = await _service.getPageableProduct(dtoFilter, pageRequest);
+        var result = await _service.GetPageableProduct(dtoFilter, pageRequest);
 
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),
