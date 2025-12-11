@@ -1,6 +1,6 @@
 ﻿namespace DotNet_StoreManagement.SharedKernel.utils;
 
-public class GetVnpayErrorMessage
+public class VnpayUtils
 {
     public static string GetVnpayErrorMessage(string responseCode)
     {
