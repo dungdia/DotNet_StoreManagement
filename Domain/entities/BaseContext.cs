@@ -161,9 +161,7 @@ public partial class BaseContext : DbContext
                 .HasDefaultValueSql("'pending'")
                 .HasColumnType("enum('pending','success','failed')")
                 .HasColumnName("status");
-            entity.Property(e => e.TransactionRef)
-                .HasColumnType("bigint")
-                .HasColumnName("transaction_ref");
+            entity.Property(e => e.TransactionRef).HasColumnName("transaction_ref");
         });
 
         modelBuilder.Entity<Product>(entity =>
