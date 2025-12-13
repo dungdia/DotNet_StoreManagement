@@ -39,15 +39,11 @@ public class ProductService
             pageRequest.PageSize
         );
     }
-
-    // public async Task<dynamic?> getProductById(int id)
-    // {
-    //     var product = await _repo.FindProductById(id);
-    //
-    //     if (product == null) throw APIException.BadRequest($"Mã sản phẩm không tồn tại");
-    //
-    //     return product;
-    // }
+    
+    public async Task<Page<Product>> SearchPageableProduct(ProductSearchDTO dto, PageRequest pageRequest)
+    {
+        return await _repo.SearchProductPageable<Product>(dto, pageRequest);
+    }
 
     public async Task<ProductDetailResponseDTO> getProductDetail(int id)
     {

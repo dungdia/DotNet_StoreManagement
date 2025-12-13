@@ -13,10 +13,15 @@ namespace DotNet_StoreManagement.Features.ProductAPI;
 public class ProductController : Controller
 {
     private readonly ProductService _service;
+    private readonly ILogger<ProductController> _logger;
     
-    public ProductController(ProductService service)
+    public ProductController(
+        ProductService service,
+        ILogger<ProductController> logger
+    )
     {
         _service = service;
+        _logger = logger;
     }
     
     [HttpGet]
@@ -38,6 +43,32 @@ public class ProductController : Controller
             totalPages = result.TotalPages,
             totalElements = result.TotalElements
         });
+        
+        return StatusCode(response.statusCode, response);
+    }
+    
+    // 
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchPageableProductAPI(
+        [FromQuery] ProductSearchDTO dto,
+        [FromQuery] PageRequest pageRequest
+    )
+    {   
+        var result = await _service.SearchPageableProduct(dto, pageRequest);
+
+        var response = new APIResponse<Object>(
+            HttpStatusCode.OK.value(),
+            "Get product successfully",
+            result.Content
+        ).setMetadata(new
+        {
+            pageNumber = result.PageNumber,
+            pageSize = result.PageSize,
+            totalPages = result.TotalPages,
+            totalElements = result.TotalElements
+        });
+        
+        
         
         return StatusCode(response.statusCode, response);
     }
