@@ -13,7 +13,7 @@ public class OrderFilterDTO
 
     public decimal? MaxPrice { get; set; }
     public OrderStatus? Status { get; set; }
-    public string? SortBy { get; set; } = "OrderDate";
-    public bool SortDescending { get; set; } = false;
+    public string? SortBy { get; set; } = "OrderId";
+    public bool SortDescending { get; set; } = true;
 
 }
