@@ -48,6 +48,18 @@ namespace DotNet_StoreManagement.Features.CustomerAPI
                 result);
             return StatusCode(response.statusCode, response);
         }
+        
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCustomerById()
+        {
+            var id = RouteData.Values["id"]?.ToString()!;
+            var result = await _service.GetCustomerByIdAsync(Int32.Parse(id));
+            var response = new APIResponse<Object>(
+                HttpStatusCode.OK.value(),
+                "Get customer successfully",
+                result);
+            return StatusCode(response.statusCode, response);
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateCustomerAPI(

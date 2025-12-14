@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using DotNet_StoreManagement.Domain.entities;
+﻿using DotNet_StoreManagement.Domain.entities;
 namespace DotNet_StoreManagement.Features.ProductAPI.dtos;
 
-[AutoMap(typeof(Product), ReverseMap = true)]
 public class ProductResponseDTO
 {
     public string ProductName { get; set; } = null!;

@@ -40,9 +40,9 @@ public class ProductService
         );
     }
     
-    public async Task<Page<Product>> SearchPageableProduct(ProductSearchDTO dto, PageRequest pageRequest)
+    public async Task<Page<ProductDetailResponseDTO>> SearchPageableProduct(ProductSearchDTO dto, PageRequest pageRequest)
     {
-        return await _repo.SearchProductPageable<Product>(dto, pageRequest);
+        return await _repo.SearchProductPageable<ProductDetailResponseDTO>(dto, pageRequest);
     }
 
     public async Task<ProductDetailResponseDTO> getProductDetail(int id)
