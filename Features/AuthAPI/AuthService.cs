@@ -44,6 +44,19 @@ public class AuthService
         return user;
     }
 
+    public async Task<User> userRegister(UserDTO dto)
+    {
+        var user = _mapper.Map<User>(dto);
+        user.Password = _passwordHasher.hashPassword(user.Username, user.Password);
+        user.Role = "user";
+        user.CreatedAt = DateTime.Now;
+
+        var affectedRows = await _userRepo.AddAndSaveAsync(user);
+        if (affectedRows < 0) throw new ApplicationException("Failed to register user");
+
+        return user;
+    }
+
     public async Task<Object> authenticate(UserDTO req)
     {
         var user = await _userRepo.FindUserByUsername(req.Username);
