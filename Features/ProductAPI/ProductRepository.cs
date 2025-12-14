@@ -72,9 +72,9 @@ public class ProductRepository : DPARepository<Product, int>, IProductRepository
         {
             string query = """
                               SELECT 
-                               p.product_id as productId, p.product_name as productName, p.barcode, p.price, p.unit, 
-                               s.name as supplierName,
-                               c.category_name as categoryName
+                               p.product_id as productId, p.product_name as productName, p.barcode, p.price, p.unit, p.product_img as productImg, 
+                               s.supplier_id as supplierId, s.name as supplierName,
+                               c.category_id as categoryId, c.category_name as categoryName
                               FROM products p 
                               LEFT JOIN suppliers s ON s.supplier_id = p.supplier_id
                               LEFT JOIN categories c ON c.category_id = p.category_id
@@ -91,7 +91,7 @@ public class ProductRepository : DPARepository<Product, int>, IProductRepository
                 .SearchFilter(!string.IsNullOrEmpty(dto.Unit), "p.unit LIKE ?", $"{dto.Unit}%")
                 .RangeFilter("p.price", dto.MinPrice, dto.MaxPrice)
                 .RangeFilter("p.created_at", dto.StartDate, dto.EndDate)
-                .InFilter("c.category_name", dto.Category);
+                .InFilter("c.category_id", dto.Category);
             
             var countQuery = queryData.ToCountQuery();
             var totalElements = await _context.executeSqlRawAsync<int>(countQuery.Query, countQuery.Parameters.ToArray());
