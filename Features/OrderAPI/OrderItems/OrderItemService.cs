@@ -2,6 +2,7 @@
 using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.Features.OrderAPI.dtos;
 using DotNet_StoreManagement.Features.OrderAPI.impl;
+using DotNet_StoreManagement.Features.OrderAPI.mapping;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
 
@@ -12,22 +13,24 @@ public class OrderItemService
 {
 
     private readonly IOrderItemRepository _repo;
-    private readonly IMapper _mapper;
+    private readonly IOrderItemMapper _mapper;
 
-    public OrderItemService(IOrderItemRepository repo, IMapper mapper)
+    public OrderItemService(IOrderItemRepository repo, IOrderItemMapper mapper)
     {
         _repo = repo;
         _mapper = mapper;
     }
 
-    public async Task<ICollection<OrderItem>> GetOrderItemsByOrderIdAsync(int orderId)
+    public async Task<ICollection<OrderItemDTO>> GetOrderItemsWithProductByOrderIdAsync(int orderId)
     {
-        return await _repo.FindAsync(oi => oi.OrderId == orderId);
+        var orderItems = await _repo.FindWithProductAsync(oi => oi.OrderId == orderId);
+        return orderItems.Select(orderItem => _mapper.ToDTO(orderItem)).ToList();
     }
+
 
     public async Task<OrderItem> CreateOrderItemAsync(OrderItemDTO dto)
     {
-        var orderItem = _mapper.Map<OrderItem>(dto);
+        var orderItem = _mapper.ToEntity(dto);
         await _repo.AddAsync(orderItem);
         var affectedRows = await _repo.SaveChangesAsync();
 
@@ -38,7 +41,7 @@ public class OrderItemService
 
     public async Task<List<OrderItem>> CreateOrderItemListAsync(List<OrderItemDTO> dtoList)
     {
-        var orderItemList = _mapper.Map<List<OrderItem>>(dtoList);
+        var orderItemList = dtoList.Select(dto => _mapper.ToEntity(dto)).ToList();
         foreach (var orderItem in orderItemList)
         {
             await _repo.AddAsync(orderItem);

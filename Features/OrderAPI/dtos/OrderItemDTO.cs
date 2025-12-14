@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DotNet_StoreManagement.Domain.entities;
+using DotNet_StoreManagement.Features.ProductAPI.dtos;
 
 namespace DotNet_StoreManagement.Features.OrderAPI.dtos;
 
@@ -11,4 +12,5 @@ public class OrderItemDTO
     public int Quantity { get; set; }
     public decimal Price { get; set; }
     public decimal Subtotal { get; set; }
+    public ProductDTO? Product { get; set; }
 }
