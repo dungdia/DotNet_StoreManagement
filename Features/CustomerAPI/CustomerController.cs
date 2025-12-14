@@ -37,6 +37,18 @@ namespace DotNet_StoreManagement.Features.CustomerAPI
             return StatusCode(response.statusCode, response);
         }
 
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> GetCustomerByUserIdAsync()
+        {
+            var id = RouteData.Values["id"]?.ToString()!;
+            var result = await _service.GetCustomerByUserIdAsync(Int32.Parse(id));
+            var response = new APIResponse<Object>(
+                HttpStatusCode.OK.value(),
+                "Get customer successfully",
+                result);
+            return StatusCode(response.statusCode, response);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateCustomerAPI(
             [FromBody] CustomerDTO dto

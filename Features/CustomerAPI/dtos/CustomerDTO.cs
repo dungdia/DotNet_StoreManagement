@@ -15,5 +15,5 @@ public class CustomerDTO
     [EmailAddress(ErrorMessage = "Địa chỉ email không hợp lệ.")]
     public string? Email { get; set; } = null;
     public string? Address { get; set; } = null;
-    public int? UserId { get; set; } = null;
+    public int? AccountId { get; set; } = null;
 }

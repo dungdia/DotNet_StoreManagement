@@ -50,7 +50,7 @@ public class AuthController : ControllerBase
         
         CustomerDTO customerDTO = new CustomerDTO()
         {
-            UserId = result.UserId,
+            AccountId = result.UserId,
             Name = request.Name,
         };
         await _customerService.CreateCustomerAsync(customerDTO);
