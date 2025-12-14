@@ -44,7 +44,7 @@ public class JwtTokenProvider
             new Claim("userId", user.UserId.ToString()),
             new Claim(JwtRegisteredClaimNames.Sub, user.Username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("role", user.Role!)
+            new Claim("role", user.Role!),
         };
         
         string secretKey = _key;
