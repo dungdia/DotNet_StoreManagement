@@ -35,7 +35,23 @@ public class AuthController : ControllerBase
         
         return StatusCode(response.statusCode, response);
     }
-    
+
+    [HttpPost("user-register")]
+    public async Task<IActionResult> registerUserAccountAPI(
+        [FromBody] UserDTO request
+    )
+    {
+        var result = await _authService.register(request);
+
+        var response = new APIResponse<Object>(
+            HttpStatusCode.OK.value(),
+            "Login successfully",
+            result
+        );
+
+        return StatusCode(response.statusCode, response);
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> loginAccountAPI(
         [FromBody] UserDTO request
