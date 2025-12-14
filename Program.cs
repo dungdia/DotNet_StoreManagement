@@ -8,6 +8,10 @@ using Scalar.AspNetCore;
 using Serilog;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using DotNet_StoreManagement.Features.OrderAPI.mapping;
+using DotNet_StoreManagement.Features.OrderAPI.Mappings;
+
+
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -38,6 +42,9 @@ builder.Services.AddAutoMapper(cfg =>
 // builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly(), typeof(MappingConfig).Assembly);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddAutoMapper(typeof(OrderItemMapper));
+builder.Services.AddScoped<IOrderItemMapper, OrderItemMapper>();
+
 
 builder.Services.AddOpenApi();
 

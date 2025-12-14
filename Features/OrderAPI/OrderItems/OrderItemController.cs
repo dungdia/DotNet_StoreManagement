@@ -17,12 +17,12 @@ public class OrderItemController : Controller
         _service = service;
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{orderId:int}")]
     public async Task<IActionResult> GetOrderItemsAsync(
-        [FromRoute] int id
+        [FromRoute] int orderId
     )
     {
-        var result = await _service.GetOrderItemsByOrderIdAsync(id);
+        var result = await _service.GetOrderItemsWithProductByOrderIdAsync(orderId);
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),
             "Get order items successfully",
