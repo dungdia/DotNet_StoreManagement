@@ -21,7 +21,7 @@ public class OrderItemService
         _mapper = mapper;
     }
 
-    public async Task<ICollection<OrderItemDTO>> GetOrderItemsWithProductByOrderIdAsync(int orderId)
+    public async Task<List<OrderItemDTO>> GetOrderItemsWithProductByOrderIdAsync(int orderId)
     {
         var orderItems = await _repo.FindWithProductAsync(oi => oi.OrderId == orderId);
         return orderItems.Select(orderItem => _mapper.ToDTO(orderItem)).ToList();

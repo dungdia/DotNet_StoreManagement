@@ -208,4 +208,10 @@ public class OrderService
         return order;
     }
 
+    public async Task<OrderDTO?> GetOrderByIdAsync(int id)
+    {
+        var order = await _repo.GetByIdAsync(id);
+        if (order == null) throw APIException.BadRequest("Invalid Customer's ID");
+        return _mapper.Map<OrderDTO>(order);
+    }
 }

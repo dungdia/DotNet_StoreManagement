@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DotNet_StoreManagement.Domain.entities.@base;
 using DotNet_StoreManagement.Features.OrderAPI.dtos;
+using DotNet_StoreManagement.Features.OrderAPI.OrderItems;
 using DotNet_StoreManagement.Features.PaymentAPI;
 using DotNet_StoreManagement.SharedKernel.utils;
 using Microsoft.AspNetCore.Mvc;
@@ -19,13 +20,15 @@ public class OrderController : Controller
 {
     private readonly OrderService _service;
     private readonly PaymentService _paymentService;
+    private readonly OrderItemService _orderItemService;
     private readonly IVnpayClient _vnpayService;
 
-    public OrderController(OrderService service, PaymentService paymentService, IVnpayClient vnpayService)
+    public OrderController(OrderService service, PaymentService paymentService, IVnpayClient vnpayService, OrderItemService orderItemService)
     {
         _service = service;
         _paymentService = paymentService;
         _vnpayService = vnpayService;
+        _orderItemService = orderItemService;
     }
 
     [HttpGet]
@@ -37,11 +40,19 @@ public class OrderController : Controller
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),
             "Get orders successfully",
-            result
-        );
+            result.Content
+        ).setMetadata(new
+        {
+            pageNumber = result.PageNumber,
+            pageSize = result.PageSize,
+            totalPages = result.TotalPages,
+            totalElements = result.TotalElements
+        }
+        ) ;
 
         return StatusCode(response.statusCode, response);
     }
+
 
     [HttpGet("customer/{customerId:int}")]
     public async Task<IActionResult> GetOrderByCustomerIdAsync(
@@ -158,4 +169,17 @@ public class OrderController : Controller
         }
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetOrderDetailById()
+    {
+        var id = RouteData.Values["id"]?.ToString()!;
+        var order = await _service.GetOrderByIdAsync(Int32.Parse(id));
+        var orderItems = await _orderItemService.GetOrderItemsWithProductByOrderIdAsync(Int32.Parse(id));
+        var result = new OrderDetailDTO(order!, orderItems);
+        var response = new APIResponse<Object>(
+            HttpStatusCode.OK.value(),
+            "Get customer successfully",
+            result);
+        return StatusCode(response.statusCode, response);
+    }
 }

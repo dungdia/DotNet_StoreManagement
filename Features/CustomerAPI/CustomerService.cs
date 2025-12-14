@@ -80,4 +80,11 @@ public class CustomerService
         
         return customer;
     }
+
+    public async Task<Customer?> GetCustomerByIdAsync(int id)
+    {
+        var customer = await _repo.GetByIdAsync(id);
+        if (customer == null) throw APIException.BadRequest("Invalid Customer's ID");
+        return customer;
+    }
 }
