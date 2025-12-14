@@ -18,4 +18,9 @@ namespace DotNet_StoreManagement.Features.CustomerAPI;
         {
             return _context.Customers;
         }
+
+        //public async Task<Customer?> GetByUserIdAsync(int userId)
+        //{
+        //    return await _context.Customers.FirstOrDefault(c => c.AccountId == userId);
+        //}
 }

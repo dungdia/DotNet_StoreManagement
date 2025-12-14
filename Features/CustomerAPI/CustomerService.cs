@@ -8,8 +8,9 @@ using DotNet_StoreManagement.Features.CustomerAPI.dtos;
 using DotNet_StoreManagement.Features.CustomerAPI.impl;
 using DotNet_StoreManagement.SharedKernel.configuration;
 using DotNet_StoreManagement.SharedKernel.exception;
-using System.Linq.Expressions;
 using DotNet_StoreManagement.SharedKernel.persistence;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DotNet_StoreManagement.Features.CustomerAPI;
     [Service]    
@@ -17,11 +18,13 @@ public class CustomerService
 {
     private readonly ICustomerRepository _repo;
     private readonly IMapper _mapper;
+    private readonly AppDbContext _context;
 
-    public CustomerService(ICustomerRepository repo, IMapper mapper)
+    public CustomerService(ICustomerRepository repo, IMapper mapper, AppDbContext context)
     {
         _repo = repo;
         _mapper = mapper;
+        _context = context;
     }
 
     public async Task<Page<Customer>> GetPageableCustomerAsync(CustomerFilterDTO? dtoFilter, PageRequest pageRequest)
@@ -40,6 +43,14 @@ public class CustomerService
             pageRequest.PageNumber,
             pageRequest.PageSize
         );
+    }
+
+    public async Task<Customer?> GetCustomerByUserIdAsync(int id)
+    {
+        var customer = await _context.Customers
+                        .FirstOrDefaultAsync(c=>c.AccountId==id);
+        if (customer == null) throw APIException.BadRequest("Not found");
+        return customer;
     }
 
     public async Task<Customer> CreateCustomerAsync(CustomerDTO dto)
