@@ -1,6 +1,8 @@
 ﻿using System.Net;
+using DotNet_StoreManagement.Domain.entities;
 using DotNet_StoreManagement.Domain.entities.@base;
 using DotNet_StoreManagement.Features.AuthAPI.repositories;
+using DotNet_StoreManagement.Features.CustomerAPI;
 using DotNet_StoreManagement.SharedKernel.security;
 using DotNet_StoreManagement.SharedKernel.utils;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +14,15 @@ namespace DotNet_StoreManagement.Features.AuthAPI;
 public class AuthController : ControllerBase
 {
     private readonly AuthService _authService;
-    
+    private readonly CustomerService _customerService;
+
     public AuthController(
-        AuthService authService
+        AuthService authService,
+        CustomerService customerService
     )
     {
         _authService = authService;
+        _customerService = customerService;
     }
     
     [HttpPost("register")]
@@ -29,7 +34,7 @@ public class AuthController : ControllerBase
         
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),
-            "Login successfully",
+            "Đăng ký tài khoản thành công",
             result
         );
         
@@ -41,11 +46,17 @@ public class AuthController : ControllerBase
         [FromBody] UserDTO request
     )
     {
-        var result = await _authService.register(request);
-
+        var result = await _authService.userRegister(request);
+        
+        CustomerDTO customerDTO = new CustomerDTO()
+        {
+            UserId = result.UserId,
+            Name = request.Name,
+        };
+        await _customerService.CreateCustomerAsync(customerDTO);
         var response = new APIResponse<Object>(
             HttpStatusCode.OK.value(),
-            "Login successfully",
+            "Đăng ký tài khoản thành công",
             result
         );
 
