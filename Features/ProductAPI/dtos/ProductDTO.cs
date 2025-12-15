@@ -23,4 +23,6 @@ public class ProductDTO
     public string? ProductImg { get; set; }
     
     public int? SupplierId { get; set; }
+    
+    public int? CategoryId { get; set; }
 }
