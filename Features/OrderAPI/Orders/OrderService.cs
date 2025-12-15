@@ -208,10 +208,40 @@ public class OrderService
         return order;
     }
 
-    public async Task<OrderDTO?> GetOrderByIdAsync(int id)
+    public async Task<Order> RepayOrderAsync(int id)
+    {
+        using var transaction = _context.Database.BeginTransaction();
+        try
+        {
+            var order = await _repo.GetByIdAsync(id);
+            if (order == null)
+                throw APIException.BadRequest("Order not found");
+            var newPayment = new Payment
+            {
+                OrderId = order.OrderId,
+                Amount = order.TotalAmount ?? 0,
+                PaymentMethod = "bank_transfer",
+                PaymentDate = DateTime.UtcNow,
+                Status = PaymentStatus.PENDING.ToString()
+            };
+            _context.Payments.Add(newPayment);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return order;
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error repaying order: {Message}", ex.Message);
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<Order?> GetOrderByIdAsync(int id)
     {
         var order = await _repo.GetByIdAsync(id);
         if (order == null) throw APIException.BadRequest("Invalid Customer's ID");
-        return _mapper.Map<OrderDTO>(order);
+        return _mapper.Map<Order>(order);
     }
 }
