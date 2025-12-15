@@ -136,13 +136,17 @@ public class PaymentService
         await _context.SaveChangesAsync();
     }
 
-    public async Task ConfirmPaymentFailedAsync(long transactionRef, string reason)
+    public async Task ConfirmPaymentFailedAsync(long transactionRef)
     {
         var payment = await _context.Payments
                                     .FirstOrDefaultAsync(p => p.TransactionRef == transactionRef);
-        if (payment != null)
+        if (payment == null) throw new Exception("Không tìm thấy giao dịch thanh toán");
+        if (payment.Status == "success") return;
+        payment.Status = "failed";
+        var order = await _context.Orders.FindAsync(payment.OrderId);
+        if (order != null)
         {
-            payment.Status = "failed";
+            order.Status = "pending";
             await _context.SaveChangesAsync();
         }
     }

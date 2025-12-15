@@ -118,7 +118,9 @@ public class OrderController : Controller
         string paymentUrl = "";
         if(dto.PaymentMethod == "bank_transfer")
         {
-            var vnpayrequest = new VnpayPaymentRequest();
+            var vnpayrequest = new VnpayPaymentRequest
+                
+                ();
             vnpayrequest.Money = (double) orderResult.TotalAmount;
             vnpayrequest.Description = $"Thanh toan don hang #{orderResult.OrderId} tai DotNet Store";
             vnpayrequest.BankCode = BankCode.ANY;
@@ -143,15 +145,58 @@ public class OrderController : Controller
         return StatusCode(response.statusCode, response);
     }
 
-    [HttpGet("checkout/proceedAfterPayment")]
-    public async Task<IActionResult> ProceedAfterPayment()
+    [HttpGet("checkout/repayOrder/{orderId:int}")]
+    public async Task<IActionResult> RepayOrderAPI(int orderId)
     {
+        string paymentUrl = "";
+        var repayResult = await _service.RepayOrderAsync(orderId);
+
+        var vnpayrequest = new VnpayPaymentRequest();
+        vnpayrequest.Money = (double)repayResult.TotalAmount;
+        vnpayrequest.Description = $"Thanh toan don hang #{repayResult.OrderId} tai DotNet Store";
+        vnpayrequest.BankCode = BankCode.ANY;
+        vnpayrequest.Language = DisplayLanguage.Vietnamese;
+
+        long transactionRef = vnpayrequest.PaymentId;
+
+        await _paymentService.UpdateTransactionRefAsync(repayResult.OrderId, transactionRef);
+
+        paymentUrl = _vnpayService.CreatePaymentUrl(vnpayrequest).Url;
+        var response = new APIResponse<Object>(
+            HttpStatusCode.OK.value(),
+            "Tạo URL thanh toán thành công",
+            new { PaymentUrl = paymentUrl }
+        );
+
+        return StatusCode(response.statusCode, response);
+    }
+
+    [HttpGet("checkout/proceedAfterPayment")]
+    public async Task<IActionResult> ProceedAfterPayment(
+        [FromQuery(Name = "vnp_Amount")] long? vnpAmount,
+        [FromQuery(Name = "vnp_BankCode")] string? vnpBankCode,
+        [FromQuery(Name = "vnp_BankTranNo")] string? vnpBankTranNo,
+        [FromQuery(Name = "vnp_CardType")] string? vnpCardType,
+        [FromQuery(Name = "vnp_OrderInfo")] string? vnpOrderInfo,
+        [FromQuery(Name = "vnp_PayDate")] string? vnpPayDate,
+        [FromQuery(Name = "vnp_ResponseCode")] string? vnpResponseCode,
+        [FromQuery(Name = "vnp_TmnCode")] string? vnpTmnCode,
+        [FromQuery(Name = "vnp_TransactionNo")] string? vnpTransactionNo,
+        [FromQuery(Name = "vnp_TransactionStatus")] string? vnpTransactionStatus,
+        [FromQuery(Name = "vnp_TxnRef")] string? vnpTxnRef,
+        [FromQuery(Name = "vnp_SecureHash")] string? vnpSecureHash
+    )
+    {
+        VnpayPaymentResult paymentResult = null;
         try
         {
-            var paymentResult = _vnpayService.GetPaymentResult(this.Request);
-
+            paymentResult = _vnpayService.GetPaymentResult(Request.Query);
             long transactionRef = paymentResult.PaymentId;
-            await _paymentService.ConfirmPaymentSuccessAsync(transactionRef);
+            if(vnpResponseCode == "00")
+            {
+                await _paymentService.ConfirmPaymentSuccessAsync(transactionRef);
+            }
+                
             var response = new APIResponse<Object>(
                 HttpStatusCode.OK.value(),
                 "Thanh toán thành công",
@@ -161,7 +206,26 @@ public class OrderController : Controller
         }
         catch (VnpayException ex)  // Bắt lỗi liên quan đến VNPAY
         {
-            return BadRequest(ex.Message);
+            // 1. Dùng biến vnpTxnRef từ tham số hàm (đã có sẵn)
+            if (!string.IsNullOrEmpty(vnpTxnRef) && long.TryParse(vnpTxnRef, out long transactionRef))
+            {
+                // Cập nhật trạng thái đơn hàng thành thất bại
+                await _paymentService.ConfirmPaymentFailedAsync(transactionRef);
+            }
+            else
+            {
+                // Log lỗi: Không lấy được mã đơn hàng từ URL
+                Console.WriteLine("Lỗi: Không tìm thấy vnp_TxnRef trong URL khi xử lý exception");
+            }
+
+            // 2. Trả về response (Lưu ý: paymentResult lúc này là null, đừng truyền nó vào response nếu response không handle null)
+            var response = new APIResponse<Object>(
+                HttpStatusCode.OK.value(), // Hoặc BadRequest tùy bạn
+                $"Thanh toán thất bại. Lỗi: {ex.Message}",
+                null // Truyền null vì không có object kết quả
+            );
+
+            return StatusCode(response.statusCode, response);
         }
         catch (Exception ex)
         {
