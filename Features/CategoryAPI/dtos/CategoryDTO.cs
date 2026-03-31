@@ -8,6 +8,6 @@ namespace DotNet_StoreManagement.Features.CategoryAPI.dtos
     public class CategoryDTO
     {
         [MinLength(3, ErrorMessage = "Tên loại phải từ 3 ký tự trở lên")]
-        public string Name { get; set; } = null!;
+        public string CategoryName { get; set; }
     }
 }

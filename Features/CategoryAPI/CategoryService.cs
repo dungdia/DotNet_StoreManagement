@@ -27,7 +27,7 @@ public class CategoryService
 
         query = query
             .Filter("CategoryId", dtoFilter?.CategoryId.ToString(), FilterType.CONTAINS)
-            .Filter("Name", dtoFilter?.Name, FilterType.CONTAINS);
+            .Filter("CategoryName", dtoFilter?.CategoryName, FilterType.CONTAINS);
 
         return await _repo.FindAllPageAsync(
             query,

@@ -8,7 +8,7 @@ using System.Net;
 namespace DotNet_StoreManagement.Features.CategoryAPI;
 
 [ApiController]
-[Route("api/v1/Category/")]
+[Route("api/v1/category/")]
 public class CategoryController : Controller
 {
     private readonly CategoryService _service;
@@ -18,7 +18,7 @@ public class CategoryController : Controller
         _service = service;
     }
 
-    [HttpGet("Pageable")]
+    [HttpGet("pageable")]
     public async Task<IActionResult> GetPageableCategoriesAsync(
             [FromQuery] PageRequest pageRequest
         )
@@ -95,7 +95,7 @@ public class CategoryController : Controller
         return StatusCode(response.statusCode, response);
     }
 
-    [HttpGet("Search")]
+    [HttpGet("search")]
     public async Task<IActionResult> SearchCategoriesAPI(
             [FromQuery] CategoryFilterDTO filterDTO,
             [FromQuery] PageRequest pageRequest
